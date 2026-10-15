@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#10b981">
+  <meta name="description" content="Healthy - theo dõi nước uống, cân nặng, vận động và giấc ngủ mỗi ngày">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Healthy">
+  <title>Healthy</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <h1>Healthy</h1>
+      <p id="today-label" class="muted"></p>
+    </div>
+    <div class="date-nav">
+      <button class="icon-btn" id="prev-day" aria-label="Ngày trước">‹</button>
+      <button class="icon-btn" id="next-day" aria-label="Ngày sau">›</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- Tổng quan -->
+    <section class="view active" id="view-home">
+      <div class="card hero">
+        <div class="ring-wrap">
+          <svg viewBox="0 0 120 120" class="ring">
+            <circle cx="60" cy="60" r="52" class="ring-bg"/>
+            <circle cx="60" cy="60" r="52" class="ring-fg" id="score-ring"/>
+          </svg>
+          <div class="ring-text">
+            <strong id="score-value">0</strong>
+            <span>điểm hôm nay</span>
+          </div>
+        </div>
+        <p id="score-tip" class="tip"></p>
+      </div>
+
+      <div class="grid">
+        <button class="stat" data-go="water">
+          <span class="stat-icon">💧</span>
+          <span class="stat-label">Nước</span>
+          <strong id="home-water">0 ml</strong>
+          <div class="bar"><i id="home-water-bar"></i></div>
+        </button>
+        <button class="stat" data-go="activity">
+          <span class="stat-icon">🏃</span>
+          <span class="stat-label">Vận động</span>
+          <strong id="home-activity">0 phút</strong>
+          <div class="bar"><i id="home-activity-bar"></i></div>
+        </button>
+        <button class="stat" data-go="sleep">
+          <span class="stat-icon">😴</span>
+          <span class="stat-label">Giấc ngủ</span>
+          <strong id="home-sleep">-</strong>
+          <div class="bar"><i id="home-sleep-bar"></i></div>
+        </button>
+        <button class="stat" data-go="weight">
+          <span class="stat-icon">⚖️</span>
+          <span class="stat-label">BMI</span>
+          <strong id="home-bmi">-</strong>
+          <small id="home-bmi-label" class="muted"></small>
+        </button>
+      </div>
+
+      <div class="card">
+        <h2>7 ngày gần nhất · Nước uống</h2>
+        <div class="week" id="week-chart"></div>
+      </div>
+    </section>
+
+    <!-- Nước -->
+    <section class="view" id="view-water">
+      <div class="card center">
+        <div class="glass">
+          <div class="glass-fill" id="glass-fill"></div>
+          <div class="glass-text">
+            <strong id="water-total">0</strong>
+            <span>/ <span id="water-goal">2000</span> ml</span>
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn" data-water="150">+150 ml</button>
+          <button class="btn primary" data-water="250">+250 ml</button>
+          <button class="btn" data-water="500">+500 ml</button>
+        </div>
+        <button class="btn ghost" id="water-undo">Hoàn tác lần cuối</button>
+      </div>
+      <div class="card">
+        <h2>Lịch sử hôm nay</h2>
+        <ul class="list" id="water-log"></ul>
+      </div>
+    </section>
+
+    <!-- Vận động -->
+    <section class="view" id="view-activity">
+      <div class="card">
+        <h2>Thêm hoạt động</h2>
+        <form id="activity-form" class="form">
+          <label>Loại
+            <select name="type" id="activity-type">
+              <option value="walk" data-met="3.5">🚶 Đi bộ</option>
+              <option value="run" data-met="8">🏃 Chạy bộ</option>
+              <option value="bike" data-met="6">🚴 Đạp xe</option>
+              <option value="swim" data-met="7">🏊 Bơi</option>
+              <option value="yoga" data-met="2.5">🧘 Yoga</option>
+              <option value="gym" data-met="5">🏋️ Tập gym</option>
+            </select>
+          </label>
+          <label>Thời gian (phút)
+            <input type="number" name="minutes" min="1" max="600" value="30" inputmode="numeric" required>
+          </label>
+          <button class="btn primary block" type="submit">Lưu hoạt động</button>
+        </form>
+      </div>
+      <div class="card">
+        <h2>Hôm nay <span class="muted" id="activity-summary"></span></h2>
+        <ul class="list" id="activity-log"></ul>
+      </div>
+    </section>
+
+    <!-- Giấc ngủ -->
+    <section class="view" id="view-sleep">
+      <div class="card">
+        <h2>Giấc ngủ đêm qua</h2>
+        <form id="sleep-form" class="form">
+          <div class="row">
+            <label>Đi ngủ
+              <input type="time" name="bed" value="23:00" required>
+            </label>
+            <label>Thức dậy
+              <input type="time" name="wake" value="06:30" required>
+            </label>
+          </div>
+          <label>Chất lượng
+            <div class="quality" id="sleep-quality">
+              <button type="button" data-q="1">😫</button>
+              <button type="button" data-q="2">😕</button>
+              <button type="button" data-q="3" class="on">😐</button>
+              <button type="button" data-q="4">🙂</button>
+              <button type="button" data-q="5">😄</button>
+            </div>
+          </label>
+          <button class="btn primary block" type="submit">Lưu giấc ngủ</button>
+        </form>
+        <p class="tip" id="sleep-result"></p>
+      </div>
+    </section>
+
+    <!-- Cân nặng -->
+    <section class="view" id="view-weight">
+      <div class="card">
+        <h2>Cân nặng & BMI</h2>
+        <form id="weight-form" class="form">
+          <div class="row">
+            <label>Chiều cao (cm)
+              <input type="number" name="height" min="80" max="250" step="0.1" inputmode="decimal" required>
+            </label>
+            <label>Cân nặng (kg)
+              <input type="number" name="weight" min="20" max="300" step="0.1" inputmode="decimal" required>
+            </label>
+          </div>
+          <button class="btn primary block" type="submit">Lưu hôm nay</button>
+        </form>
+        <div class="bmi-box" id="bmi-box" hidden>
+          <strong id="bmi-value"></strong>
+          <span id="bmi-label"></span>
+          <div class="bmi-scale"><i id="bmi-marker"></i></div>
+          <div class="bmi-legend"><span>Gầy</span><span>Bình thường</span><span>Thừa cân</span><span>Béo phì</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Biểu đồ cân nặng</h2>
+        <canvas id="weight-chart" height="180"></canvas>
+        <p class="muted small" id="weight-empty">Chưa có dữ liệu. Hãy lưu cân nặng đầu tiên.</p>
+      </div>
+    </section>
+
+    <!-- Cài đặt -->
+    <section class="view" id="view-settings">
+      <div class="card">
+        <h2>Mục tiêu mỗi ngày</h2>
+        <form id="settings-form" class="form">
+          <label>Nước uống (ml)
+            <input type="number" name="waterGoal" min="500" max="6000" step="50" inputmode="numeric">
+          </label>
+          <label>Vận động (phút)
+            <input type="number" name="activityGoal" min="5" max="300" inputmode="numeric">
+          </label>
+          <label>Giấc ngủ (giờ)
+            <input type="number" name="sleepGoal" min="4" max="12" step="0.5" inputmode="decimal">
+          </label>
+          <button class="btn primary block" type="submit">Lưu mục tiêu</button>
+        </form>
+      </div>
+      <div class="card">
+        <h2>Dữ liệu</h2>
+        <p class="muted small">Dữ liệu chỉ lưu trên trình duyệt của thiết bị này.</p>
+        <div class="btn-row">
+          <button class="btn" id="export-btn">Xuất JSON</button>
+          <label class="btn">Nhập JSON<input type="file" id="import-file" accept="application/json" hidden></label>
+          <button class="btn danger" id="reset-btn">Xóa hết</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <nav class="tabbar">
+    <button data-go="home" class="active"><span>🏠</span>Tổng quan</button>
+    <button data-go="water"><span>💧</span>Nước</button>
+    <button data-go="activity"><span>🏃</span>Vận động</button>
+    <button data-go="sleep"><span>😴</span>Ngủ</button>
+    <button data-go="weight"><span>⚖️</span>BMI</button>
+    <button data-go="settings"><span>⚙️</span>Cài đặt</button>
+  </nav>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
