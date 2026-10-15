@@ -33,47 +33,47 @@ window.PLAN_DATA = (() => {
 
   // Thực đơn mẫu theo thứ trong tuần (0 = Chủ nhật). Khẩu phần tinh bột là mức gốc, app tự điều chỉnh theo giai đoạn.
   const MENUS = [
-    { // CN
-      'Bữa sáng': [['khoailang', 200], ['trung', 150], ['suatuoi', 180]],
-      'Bữa trưa': [['com', 180], ['bonac', 150], ['rau', 250], ['dau', 5]],
+    { // CN · 1 trứng
+      'Bữa sáng': [['khoailang', 200], ['trung', 50], ['suachua', 100], ['suatuoi', 180]],
+      'Bữa trưa': [['com', 180], ['bonac', 170], ['rau', 250], ['dau', 5]],
+      'Bữa phụ':  [['chuoi', 100], ['suadauna', 250]],
+      'Bữa tối':  [['com', 120], ['cathu', 180], ['dauphu', 150], ['rau', 250], ['dau', 5]]
+    },
+    { // T2 · 1 trứng
+      'Bữa sáng': [['yenmach', 50], ['suatuoi', 220], ['trung', 50], ['suachua', 100]],
+      'Bữa trưa': [['com', 180], ['ucga', 220], ['rau', 250], ['dau', 5]],
+      'Bữa phụ':  [['oi', 150], ['suadauna', 250]],
+      'Bữa tối':  [['com', 120], ['basa', 220], ['dauphu', 100], ['rau', 200], ['dau', 5]]
+    },
+    { // T3 · 2 trứng
+      'Bữa sáng': [['banhmi', 80], ['trung', 100], ['salad', 150], ['dau', 5]],
+      'Bữa trưa': [['com', 180], ['heonac', 200], ['rau', 250]],
       'Bữa phụ':  [['suachua', 100], ['chuoi', 100]],
-      'Bữa tối':  [['com', 120], ['cangu', 120], ['dauphu', 150], ['rau', 250]]
+      'Bữa tối':  [['com', 120], ['muc', 250], ['dauphu', 100], ['rau', 250], ['dau', 5]]
     },
-    { // T2
-      'Bữa sáng': [['yenmach', 50], ['suatuoi', 180], ['trung', 150]],
-      'Bữa trưa': [['com', 180], ['ucga', 200], ['rau', 250], ['dau', 5]],
-      'Bữa phụ':  [['suachua', 100], ['oi', 150]],
-      'Bữa tối':  [['com', 120], ['basa', 200], ['dauphu', 100], ['rau', 200], ['dau', 5]]
+    { // T4 · 1 trứng
+      'Bữa sáng': [['khoailang', 200], ['trung', 50], ['suatuoi', 220], ['suachua', 100]],
+      'Bữa trưa': [['bun', 200], ['ucga', 200], ['rau', 200], ['dau', 5]],
+      'Bữa phụ':  [['oi', 150], ['suadauna', 250]],
+      'Bữa tối':  [['com', 120], ['tom', 200], ['dauphu', 100], ['rau', 250], ['dau', 5]]
     },
-    { // T3
-      'Bữa sáng': [['banhmi', 80], ['trung', 150], ['salad', 150], ['dau', 5]],
-      'Bữa trưa': [['com', 180], ['heonac', 180], ['rau', 250]],
-      'Bữa phụ':  [['suatuoi', 220], ['chuoi', 100]],
-      'Bữa tối':  [['com', 120], ['cangu', 120], ['dauphu', 150], ['salad', 150], ['dau', 5]]
-    },
-    { // T4
-      'Bữa sáng': [['khoailang', 200], ['trung', 150], ['suachua', 100]],
-      'Bữa trưa': [['bun', 200], ['ucga', 170], ['rau', 200], ['dau', 5]],
-      'Bữa phụ':  [['oi', 150], ['dauphong', 15]],
-      'Bữa tối':  [['com', 120], ['tom', 200], ['rau', 250], ['dau', 5]]
-    },
-    { // T5
-      'Bữa sáng': [['yenmach', 50], ['suachua', 100], ['chuoi', 100], ['trung', 150]],
-      'Bữa trưa': [['com', 180], ['basa', 220], ['dauphu', 100], ['rau', 250], ['dau', 5]],
+    { // T5 · 2 trứng
+      'Bữa sáng': [['yenmach', 50], ['suachua', 100], ['chuoi', 100], ['trung', 100]],
+      'Bữa trưa': [['com', 180], ['basa', 220], ['rau', 250], ['dau', 5]],
       'Bữa phụ':  [['suatuoi', 220], ['tao', 150]],
-      'Bữa tối':  [['com', 100], ['ucga', 200], ['salad', 200], ['dau', 5]]
+      'Bữa tối':  [['com', 100], ['ucga', 200], ['dauphu', 100], ['salad', 200], ['dau', 5]]
     },
-    { // T6
+    { // T6 · 1 trứng
       'Bữa sáng': [['banhmi', 80], ['cangu', 120], ['trung', 50], ['salad', 150]],
       'Bữa trưa': [['com', 180], ['heonac', 180], ['rau', 250], ['dau', 5]],
       'Bữa phụ':  [['suachua', 100], ['dudu', 200]],
-      'Bữa tối':  [['com', 120], ['trung', 100], ['dauphu', 150], ['rau', 200], ['dau', 5]]
+      'Bữa tối':  [['com', 120], ['bonac', 130], ['dauphu', 100], ['rau', 250], ['dau', 5]]
     },
-    { // T7
-      'Bữa sáng': [['yenmach', 50], ['suatuoi', 180], ['trung', 150]],
+    { // T7 · 2 trứng
+      'Bữa sáng': [['yenmach', 50], ['suatuoi', 180], ['trung', 100], ['suachua', 100]],
       'Bữa trưa': [['gaolut', 180], ['ucga', 200], ['rau', 250], ['dau', 5]],
-      'Bữa phụ':  [['suachua', 100], ['oi', 150]],
-      'Bữa tối':  [['khoailang', 200], ['basa', 220], ['rau', 250], ['dau', 5]]
+      'Bữa phụ':  [['oi', 150], ['suadauna', 250]],
+      'Bữa tối':  [['khoailang', 200], ['caro', 220], ['rau', 250], ['dau', 5]]
     }
   ];
 
@@ -191,7 +191,9 @@ window.PLAN_DATA = (() => {
     bido:      { name: 'Bí đỏ',                       kcal: 26,  p: 1,   c: 6.5, f: 0.1 },
     carot:     { name: 'Cà rốt',                      kcal: 41,  p: 0.9, c: 10,  f: 0.2 },
     khoaitay:  { name: 'Khoai tây',                   kcal: 77,  p: 2,   c: 17,  f: 0.1 },
-    ngo:       { name: 'Ngô (bắp) luộc',              kcal: 96,  p: 3.4, c: 21,  f: 1.5 }
+    ngo:       { name: 'Ngô (bắp) luộc',              kcal: 96,  p: 3.4, c: 21,  f: 1.5 },
+    cathu:     { name: 'Cá thu',                      kcal: 139, p: 19.3, c: 0,  f: 6.3 },
+    muc:       { name: 'Mực ống',                     kcal: 92,  p: 15.6, c: 3,  f: 1.4 }
   });
 
   // Thông tin mua sắm. Giá tham khảo (VNĐ) tại chợ/siêu thị — sửa được trong app.
@@ -240,6 +242,10 @@ window.PLAN_DATA = (() => {
                  keep: { mode: 'Nhiệt độ phòng', days: 365, freeze: 0 }, tip: 'Chọn loại ngâm nước, không ngâm dầu. Đã mở thì để ngăn mát, dùng trong 2 ngày.' },
     tom:       { buy: 'Tôm thẻ', cat: 'Thịt, cá, trứng', price: 200000, per: 1000, unit: 'kg', yield: 1, pop: 2, where: 'Chợ, siêu thị',
                  keep: { mode: 'Ngăn mát', days: 1, freeze: 90 }, tip: 'Món đắt nhất thực đơn — có thể đổi bằng ức gà để tiết kiệm.' },
+    cathu:     { buy: 'Cá thu (cắt khúc)', cat: 'Thịt, cá, trứng', price: 250000, per: 1000, unit: 'kg', yield: 0.85, pop: 2, where: 'Chợ, siêu thị',
+                 keep: { mode: 'Ngăn mát', days: 1, freeze: 90 }, tip: 'Giàu omega-3 tốt cho tim mạch; kho nhạt hoặc áp chảo ít dầu.' },
+    muc:       { buy: 'Mực ống', cat: 'Thịt, cá, trứng', price: 220000, per: 1000, unit: 'kg', yield: 0.8, pop: 2, where: 'Chợ, siêu thị',
+                 keep: { mode: 'Ngăn mát', days: 1, freeze: 90 }, tip: 'Rất ít béo, nhiều đạm; hấp gừng hoặc xào rau. Nhờ người bán làm sạch.' },
     trung:     { buy: 'Trứng gà', cat: 'Thịt, cá, trứng', price: 3200, per: 50, unit: 'quả', yield: 1, pop: 3, where: 'Chợ, siêu thị, tạp hóa',
                  keep: { mode: 'Ngăn mát', days: 21, freeze: 0 }, tip: 'Không rửa trước khi cất, để đầu nhọn xuống dưới.' },
     dauphu:    { buy: 'Đậu phụ', cat: 'Thịt, cá, trứng', price: 20000, per: 1000, unit: 'kg', yield: 1, pop: 3, where: 'Chợ',
