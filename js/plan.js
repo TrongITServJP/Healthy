@@ -77,6 +77,27 @@
     return log[key];
   }
 
+  // ---------- Giá ----------
+  const fmtVnd = (n) => `${(Math.round(n / 500) * 500).toLocaleString('vi-VN')}đ`;
+
+  function priceOf(id) {
+    const custom = plan().prices && plan().prices[id];
+    return custom || D.MARKET[id].price;
+  }
+
+  // Quy đổi gam ăn được → gam hàng cần mua (theo mặt hàng thực sự mua)
+  function bought(id, gEaten) {
+    const m = D.MARKET[id];
+    if (m.buyAs) return bought(m.buyAs, gEaten * m.ratio);
+    return { id, g: gEaten / m.yield };
+  }
+
+  function costOf(id, gEaten) {
+    const b = bought(id, gEaten);
+    const m = D.MARKET[b.id];
+    return b.g * priceOf(b.id) / m.per;
+  }
+
   // ---------- Thực đơn ----------
   function buildMenu(weekday, target) {
     const menu = D.MENUS[weekday];
@@ -91,13 +112,13 @@
       const rows = items.map(([id, g0]) => {
         const f = D.FOODS[id];
         const g = f.carb ? Math.round(g0 * factor / 5) * 5 : g0;
-        return { name: f.name, amount: amountLabel(id, f, g), kcal: f.kcal * g / 100, p: f.p * g / 100, c: f.c * g / 100, f: f.f * g / 100 };
+        return { id, g, name: f.name, amount: amountLabel(id, f, g), cost: costOf(id, g), kcal: f.kcal * g / 100, p: f.p * g / 100, c: f.c * g / 100, f: f.f * g / 100 };
       });
       const sum = (k) => rows.reduce((a, r) => a + r[k], 0);
-      return { name, rows, kcal: sum('kcal'), p: sum('p'), c: sum('c'), f: sum('f') };
+      return { name, rows, kcal: sum('kcal'), p: sum('p'), c: sum('c'), f: sum('f'), cost: sum('cost') };
     });
     const total = (k) => meals.reduce((a, m) => a + m[k], 0);
-    return { meals, kcal: total('kcal'), p: total('p'), c: total('c'), f: total('f') };
+    return { meals, kcal: total('kcal'), p: total('p'), c: total('c'), f: total('f'), cost: total('cost') };
   }
 
   function amountLabel(id, f, g) {
@@ -117,7 +138,7 @@
         <div class="meal-head" ${key ? `data-meal="${m.name}"` : ''}>
           ${key ? '<span class="check"></span>' : ''}
           <strong>${m.name}</strong>
-          <span class="muted">${Math.round(m.kcal)} kcal · ${Math.round(m.p)} g đạm</span>
+          <span class="muted">${Math.round(m.kcal)} kcal · ${Math.round(m.p)} g đạm · <b class="price">${fmtVnd(m.cost)}</b></span>
         </div>
         <ul class="food-list">
           ${m.rows.map((r) => `<li><span>${r.name}</span><span>${r.amount}</span></li>`).join('')}
@@ -226,7 +247,7 @@
     $('#plan-workout').innerHTML = workoutHtml(w, key);
     const menu = buildMenu(weekday, kcal);
     const eaten = menu.meals.filter((m) => dayLog(key).meals.includes(m.name)).reduce((a, m) => a + m.kcal, 0);
-    $('#plan-menu-sum').textContent = `Đã ăn ${Math.round(eaten)} / ${Math.round(menu.kcal)} kcal`;
+    $('#plan-menu-sum').textContent = `Đã ăn ${Math.round(eaten)} / ${Math.round(menu.kcal)} kcal · ≈ ${fmtVnd(menu.cost)}/ngày`;
     $('#plan-menu').innerHTML = menuHtml(menu, key);
 
     // Thực đơn tuần
@@ -235,7 +256,7 @@
       `<button class="${d === menuDay ? 'active' : ''}" data-menuday="${d}">${WEEKDAYS[d]}</button>`).join('');
     const wm = buildMenu(menuDay, kcal);
     $('#menu-week-sum').textContent =
-      `${Math.round(wm.kcal)} kcal · Đạm ${Math.round(wm.p)} g · Tinh bột ${Math.round(wm.c)} g · Béo ${Math.round(wm.f)} g`;
+      `${Math.round(wm.kcal)} kcal · Đạm ${Math.round(wm.p)} g · Tinh bột ${Math.round(wm.c)} g · Béo ${Math.round(wm.f)} g · ≈ ${fmtVnd(wm.cost)}/ngày`;
     $('#menu-week').innerHTML = menuHtml(wm, null);
 
     // Lộ trình
@@ -443,7 +464,24 @@
     };
   }
 
-  window.HealthyPlan = { summary, profile: () => plan().profile };
+  // Thông tin ngày dùng cho danh sách đi chợ
+  function dayInfo(key) {
+    const week = weekOf(Math.min(PLAN_DAYS, Math.max(1, dayNumber(key))));
+    const phase = phaseOf(week);
+    const weekday = H.parseKey(key).getDay();
+    return { weekday, phase, menu: buildMenu(weekday, calc().kcal[phase]) };
+  }
+
+  window.HealthyPlan = {
+    summary, dayInfo, bought, costOf, priceOf, fmtVnd, render,
+    profile: () => plan().profile,
+    data: () => plan(),
+    tripStart: (key) => {
+      // Các chuyến đi chợ tính từ ngày bắt đầu kế hoạch, cứ 3 ngày một lần
+      const n = dayNumber(key) - 1;
+      return H.shiftKey(plan().profile.start, Math.floor(n / D.TRIP_DAYS) * D.TRIP_DAYS);
+    }
+  };
 
   H.onRender(render);
   H.onView((v) => { if (v === 'plan') render(); });

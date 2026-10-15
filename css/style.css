@@ -284,3 +284,28 @@ canvas { width: 100%; display: block; }
 .form label.inline input { width: 20px; height: 20px; accent-color: var(--primary); }
 .sync-actions { margin-top: 10px; justify-content: flex-start; }
 .warn a { color: inherit; font-weight: 700; }
+
+/* ---------- Đi chợ ---------- */
+.price { color: #b45309; font-weight: 600; white-space: nowrap; }
+@media (prefers-color-scheme: dark) { .price { color: #fbbf24; } }
+.trip-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; text-align: center; }
+.trip-head > div { flex: 1; }
+.trip-days { display: flex; flex-direction: column; gap: 6px; margin: 10px 0 6px; }
+.trip-day { background: var(--bg); border-radius: 12px; padding: 8px 12px; }
+.trip-day-head { display: flex; justify-content: space-between; }
+.buy-meta { display: flex; justify-content: space-between; gap: 8px; margin-top: 3px; }
+.buy-meta small { margin-top: 0 !important; }
+.ex-list li.done .price { color: var(--muted); }
+
+.catalog summary { font-weight: 700; cursor: pointer; padding: 2px 0; list-style-position: inside; }
+.catalog[open] summary { margin-bottom: 8px; }
+.cat-list { list-style: none; margin: 0 0 8px; padding: 0; }
+.cat-list li { display: flex; flex-direction: column; gap: 3px; padding: 10px 0; border-bottom: 1px solid var(--line); font-size: .85rem; }
+.cat-list li:last-child { border-bottom: 0; }
+.cat-top { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.cat-top strong { font-size: .93rem; }
+.stars { color: #f59e0b; font-size: .8rem; letter-spacing: 1px; }
+.tag { margin-left: auto; font-size: .7rem; padding: 2px 8px; border-radius: 999px; background: var(--bg); color: var(--muted); }
+.tag.on { background: var(--primary-soft); color: var(--primary); font-weight: 600; }
+.cat-price { display: flex; align-items: center; gap: 8px; }
+.cat-price input { width: 130px; padding: 8px 10px; }

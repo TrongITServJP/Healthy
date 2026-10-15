@@ -12,7 +12,7 @@
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
-  <link rel="stylesheet" href="css/style.css?v=3">
+  <link rel="stylesheet" href="css/style.css?v=4">
 </head>
 <body>
   <header class="topbar">
@@ -112,6 +112,7 @@
       <div class="seg">
         <button data-sub="today" class="active">Hôm nay</button>
         <button data-sub="menu">Thực đơn</button>
+        <button data-sub="market">Đi chợ</button>
         <button data-sub="road">Lộ trình</button>
         <button data-sub="heel">Gót chân</button>
         <button data-sub="setup">Thiết lập</button>
@@ -146,6 +147,66 @@
             <li><strong>Muối:</strong> hạn chế nước chấm, mì gói, đồ hộp mặn — giúp giảm tích nước, cân nặng ổn định hơn.</li>
             <li><strong>Đói giữa bữa:</strong> dưa leo, cà chua, rau luộc, trà không đường.</li>
           </ul>
+        </div>
+      </div>
+
+      <div class="sub" id="sub-market" hidden>
+        <div class="card">
+          <div class="trip-head">
+            <button class="icon-btn" id="trip-prev" aria-label="Chuyến trước">‹</button>
+            <div>
+              <strong id="trip-title"></strong>
+              <div class="muted small" id="trip-range"></div>
+            </div>
+            <button class="icon-btn" id="trip-next" aria-label="Chuyến sau">›</button>
+          </div>
+          <div class="kpis">
+            <div><strong id="trip-total"></strong><span>tiền đi chợ</span></div>
+            <div><strong id="trip-perday"></strong><span>mỗi ngày</span></div>
+            <div><strong id="trip-permeal"></strong><span>mỗi bữa (TB)</span></div>
+          </div>
+          <div class="trip-days" id="trip-days"></div>
+          <p class="muted small">Giá tham khảo chợ/siêu thị — sửa theo giá nơi bạn ở trong "Bảng giá" bên dưới.</p>
+        </div>
+
+        <div class="card">
+          <h2>Danh sách cần mua <span class="muted small" id="trip-count"></span></h2>
+          <p class="muted small">Đã cộng dồn thực đơn 3 ngày và làm tròn theo cách bán. Chạm để đánh dấu đã mua.</p>
+          <div id="trip-list"></div>
+        </div>
+
+        <div class="card" id="trip-extra-card" hidden>
+          <h2>Mua thêm giữa chừng</h2>
+          <p class="muted small">Đồ nhanh hỏng, không cấp đông được — mua đúng ngày ăn.</p>
+          <div id="trip-extra"></div>
+        </div>
+
+        <div class="card">
+          <h2>Đồ khô · kiểm tra ở nhà trước khi đi</h2>
+          <p class="muted small">Mua theo tháng; số tiền tính theo lượng dùng trong 3 ngày.</p>
+          <div id="trip-pantry"></div>
+        </div>
+
+        <div class="card">
+          <h2>Sau khi đi chợ về</h2>
+          <ul class="tips">
+            <li><strong>Chia phần ngay:</strong> thịt, cá chia theo từng bữa vào túi zip/hộp, ghi ngày ăn lên túi.</li>
+            <li><strong>Ngày 1–2:</strong> để ngăn mát. <strong>Ngày 3:</strong> cho ngăn đá.</li>
+            <li><strong>Rã đông:</strong> tối hôm trước chuyển túi từ ngăn đá xuống ngăn mát. Không rã đông ngoài nhiệt độ phòng, không cấp đông lại.</li>
+            <li><strong>Rau:</strong> nhặt bỏ lá úa, không rửa trước khi cất, bọc khăn giấy cho vào túi ở ngăn rau. Ăn rau lá trước, rau củ để sau.</li>
+            <li><strong>Trứng luộc sẵn:</strong> để cả vỏ ở ngăn mát được 5–7 ngày — tiện cho bữa sáng.</li>
+            <li><strong>Cơm:</strong> nấu 1 lần cho 2 bữa, để nguội rồi cất ngăn mát, dùng trong 24 giờ.</li>
+            <li><strong>Nấu sẵn:</strong> món đã nấu để ngăn mát tối đa 2 ngày; hâm thật nóng trước khi ăn.</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <details class="catalog">
+            <summary>Bảng giá & bảo quản thực phẩm</summary>
+            <p class="muted small">Thực phẩm phổ biến, dễ mua, giá rẻ ở chợ/siêu thị Việt Nam. ★ = mức độ phổ biến. "g đạm/10k" = số gam đạm mua được với 10.000đ (càng cao càng rẻ). Sửa giá để app tính lại tiền.</p>
+            <div id="catalog-list"></div>
+            <button class="btn ghost block" id="price-reset">Khôi phục giá mặc định</button>
+          </details>
         </div>
       </div>
 
@@ -394,9 +455,10 @@
 
   <div class="toast" id="toast"></div>
 
-  <script src="js/plan-data.js?v=3"></script>
-  <script src="js/app.js?v=3"></script>
-  <script src="js/plan.js?v=3"></script>
-  <script src="js/sync.js?v=3"></script>
+  <script src="js/plan-data.js?v=4"></script>
+  <script src="js/app.js?v=4"></script>
+  <script src="js/plan.js?v=4"></script>
+  <script src="js/market.js?v=4"></script>
+  <script src="js/sync.js?v=4"></script>
 </body>
 </html>

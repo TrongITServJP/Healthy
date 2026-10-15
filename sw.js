@@ -1,13 +1,14 @@
 // Tăng số phiên bản mỗi khi cập nhật file để điện thoại tải bản mới
-const CACHE = 'healthy-v3';
+const CACHE = 'healthy-v4';
 const ASSETS = [
   './',
   'index.html',
-  'css/style.css?v=3',
-  'js/plan-data.js?v=3',
-  'js/app.js?v=3',
-  'js/plan.js?v=3',
-  'js/sync.js?v=3',
+  'css/style.css?v=4',
+  'js/plan-data.js?v=4',
+  'js/app.js?v=4',
+  'js/plan.js?v=4',
+  'js/market.js?v=4',
+  'js/sync.js?v=4',
   'manifest.json',
   'icons/icon.svg',
   'icons/icon-192.png',
