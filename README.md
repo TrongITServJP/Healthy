@@ -30,7 +30,7 @@ python -m http.server 8000
 ## Cập nhật
 
 Sửa file → `git commit` → `git push`. GitHub Pages tự triển khai lại sau khoảng 1 phút.
-Khi đổi CSS/JS, tăng số `?v=` trong `index.html` và `sw.js`, đồng thời tăng `CACHE` trong `sw.js`, để điện thoại nhận bản mới.
+Khi đổi CSS/JS, chạy `node tools/bump-version.js` để điện thoại nhận bản mới.
 
 ## Đồng bộ Google Sheets
 

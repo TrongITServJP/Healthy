@@ -115,8 +115,13 @@
     </li>`;
   }
 
+  const isVisible = () => {
+    const sub = $('#sub-market');
+    return sub && !sub.hidden && $('#view-plan').classList.contains('active');
+  };
+
   function render() {
-    if (!$('#sub-market')) return;
+    if (!isVisible()) return;
     if (!tripKey) tripKey = HP.tripStart(H.todayKey());
     const trip = computeTrip(tripKey);
     const { main, extra, pantry } = planTrip(trip);
@@ -161,7 +166,7 @@
 
   function renderCatalog() {
     const list = $('#catalog-list');
-    if (list.contains(document.activeElement)) return;
+    if (!$('.catalog').open || list.contains(document.activeElement)) return;
     const inMenu = new Set(D.MENUS.flatMap((m) => Object.values(m).flat().map(([id]) => HP.bought(id, 1).id)));
     const ids = Object.keys(D.MARKET).filter((id) => !D.MARKET[id].buyAs);
 
@@ -195,6 +200,8 @@
   // ---------- Sự kiện ----------
   document.addEventListener('click', (e) => {
     const t = e.target;
+    // Vừa chuyển sang tab Đi chợ (plan.js đã bỏ ẩn ở handler trước)
+    if (t.closest('.seg [data-sub="market"]')) { render(); return; }
     const row = t.closest('[data-buy]');
     if (row) {
       const list = trips()[tripKey] || (trips()[tripKey] = []);
@@ -234,6 +241,8 @@
     H.toast('Đã cập nhật giá');
   });
 
+  $('.catalog').addEventListener('toggle', renderCatalog);
   H.onRender(render);
+  H.onView((v) => { if (v === 'plan') render(); });
   render();
 })();

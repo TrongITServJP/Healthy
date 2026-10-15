@@ -71,11 +71,17 @@
   const weekOf = (dayNum) => Math.min(13, Math.max(1, Math.ceil(dayNum / 7)));
   const phaseOf = (week) => (week <= 4 ? 1 : week <= 8 ? 2 : 3);
 
+  const EMPTY_LOG = Object.freeze({ ex: [], meals: [], heel: [], logged: false });
+
+  // Dùng khi ghi (tạo bản ghi nếu chưa có)
   function dayLog(key) {
     const log = plan().log;
     if (!log[key]) log[key] = { ex: [], meals: [], heel: [], logged: false };
     return log[key];
   }
+
+  // Dùng khi hiển thị: chỉ đọc, không tạo bản ghi rỗng cho mỗi ngày được xem
+  const peekLog = (key) => plan().log[key] || EMPTY_LOG;
 
   // ---------- Giá ----------
   const fmtVnd = (n) => `${(Math.round(n / 500) * 500).toLocaleString('vi-VN')}đ`;
@@ -132,7 +138,7 @@
   }
 
   function menuHtml(menu, key) {
-    const eaten = key ? dayLog(key).meals : null;
+    const eaten = key ? peekLog(key).meals : null;
     return menu.meals.map((m) => `
       <div class="meal ${eaten && eaten.includes(m.name) ? 'done' : ''}">
         <div class="meal-head" ${key ? `data-meal="${m.name}"` : ''}>
@@ -181,7 +187,7 @@
     if (w.kind === 'rest') {
       return `<p class="tip left">🛌 ${w.note}</p>`;
     }
-    const done = dayLog(key).ex;
+    const done = peekLog(key).ex;
     let idx = 0;
     const blocks = w.blocks.map((b) => `
       <h3 class="block-title">${b.title}</h3>
@@ -197,7 +203,7 @@
           </li>`;
         }).join('')}
       </ul>`).join('');
-    const logged = dayLog(key).logged;
+    const logged = peekLog(key).logged;
     return `
       <p class="muted small">🔥 Khởi động 5 phút: xoay cổ, vai, hông, cổ chân + dậm chân nhẹ.</p>
       ${blocks}
@@ -246,7 +252,7 @@
     $('#plan-workout-title').textContent = w.title + (w.minutes ? ` · ${w.minutes} phút` : '');
     $('#plan-workout').innerHTML = workoutHtml(w, key);
     const menu = buildMenu(weekday, kcal);
-    const eaten = menu.meals.filter((m) => dayLog(key).meals.includes(m.name)).reduce((a, m) => a + m.kcal, 0);
+    const eaten = menu.meals.filter((m) => peekLog(key).meals.includes(m.name)).reduce((a, m) => a + m.kcal, 0);
     $('#plan-menu-sum').textContent = `Đã ăn ${Math.round(eaten)} / ${Math.round(menu.kcal)} kcal · ≈ ${fmtVnd(menu.cost)}/ngày`;
     $('#plan-menu').innerHTML = menuHtml(menu, key);
 
@@ -263,7 +269,7 @@
     renderRoadmap(c, week);
 
     // Gót chân
-    const heelDone = dayLog(key).heel;
+    const heelDone = peekLog(key).heel;
     $('#heel-list').innerHTML = D.HEEL_ROUTINE.map((h, i) => `
       <li class="${heelDone.includes(i) ? 'done' : ''}" data-heel="${i}">
         <span class="check"></span>
@@ -444,7 +450,7 @@
   function summary(key) {
     const dayNum = dayNumber(key);
     const inPlan = dayNum >= 1 && dayNum <= PLAN_DAYS;
-    const log = plan().log[key] || { ex: [], meals: [], heel: [], logged: false };
+    const log = peekLog(key);
     const week = weekOf(Math.min(PLAN_DAYS, Math.max(1, dayNum)));
     const phase = phaseOf(week);
     const weekday = H.parseKey(key).getDay();

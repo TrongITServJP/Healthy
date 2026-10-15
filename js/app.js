@@ -41,6 +41,12 @@
   }
 
   let state = load();
+
+  // Xin trình duyệt không tự xóa dữ liệu khi máy thiếu dung lượng (Chrome/Android hỗ trợ)
+  if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
+
+  const esc = (v) => String(v).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  let sleepFormDate = null;
   let currentDate = todayKey();
   let sleepQuality = 3;
 
@@ -245,7 +251,7 @@
     // Vận động
     $('#activity-summary').textContent = d.activity.length ? `· ${actMin} phút · ${actKcal} kcal` : '';
     renderList('#activity-log', d.activity.map((a, i) => ({ ...a, i })).reverse(), (a) =>
-      `<span>${ACTIVITY_NAMES[a.type] || a.type} · ${a.minutes} phút</span>
+      `<span>${ACTIVITY_NAMES[a.type] || esc(a.type)} · ${Number(a.minutes) || 0} phút</span>
        <span><span class="muted">${a.kcal} kcal</span><button class="del" data-del-act="${a.i}" aria-label="Xóa">✕</button></span>`,
       'Chưa có hoạt động');
     $$('[data-del-act]').forEach((b) => b.addEventListener('click', () => {
@@ -259,7 +265,13 @@
       sf.bed.value = d.sleep.bed;
       sf.wake.value = d.sleep.wake;
       sleepQuality = d.sleep.q;
+    } else if (sleepFormDate !== currentDate) {
+      // Sang ngày chưa ghi giấc ngủ: về giá trị mặc định thay vì giữ số của ngày khác
+      sf.bed.value = '23:00';
+      sf.wake.value = '06:30';
+      sleepQuality = 3;
     }
+    sleepFormDate = currentDate;
     $$('#sleep-quality button').forEach((x) => x.classList.toggle('on', Number(x.dataset.q) === sleepQuality));
     $('#sleep-result').textContent = d.sleep
       ? `Bạn đã ngủ ${sleepH.toFixed(1)} giờ (mục tiêu ${s.sleepGoal} giờ). ${sleepH >= s.sleepGoal - 0.5 ? 'Tuyệt vời! 🌙' : 'Hãy cố ngủ sớm hơn nhé.'}`
