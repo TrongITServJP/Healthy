@@ -189,3 +189,92 @@ canvas { width: 100%; display: block; }
   font-size: .9rem; transition: all .25s ease; z-index: 20; white-space: nowrap;
 }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ---------- Kế hoạch 90 ngày ---------- */
+.icon-btn.small-icon { font-size: 1rem; }
+
+.plan-card {
+  width: 100%; display: flex; align-items: center; gap: 12px; text-align: left;
+  border: 0; font: inherit; color: var(--text); cursor: pointer;
+  background: linear-gradient(135deg, var(--primary-soft), var(--card));
+}
+.plan-card div { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.plan-card .chev { font-size: 1.6rem; color: var(--muted); }
+
+.plan-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 10px; }
+.plan-top strong { font-size: 1.1rem; }
+.plan-goal { text-align: right; display: flex; flex-direction: column; }
+.plan-goal strong { color: var(--primary); font-size: 1.3rem; }
+.kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 14px 0 4px; }
+.kpis div { background: var(--bg); border-radius: 12px; padding: 10px 6px; text-align: center; display: flex; flex-direction: column; }
+.kpis strong { font-size: 1.15rem; }
+.kpis span { font-size: .72rem; color: var(--muted); }
+.focus { margin: 12px 0 0; font-size: .9rem; }
+.focus::before { content: '🎯 '; }
+.status { margin: 10px 0 0; font-size: .88rem; padding: 10px 12px; border-radius: 12px; background: var(--primary-soft); }
+.warn { margin: 12px 0 0; font-size: .85rem; padding: 10px 12px; border-radius: 12px; background: #fef3c7; color: #92400e; }
+
+.seg {
+  display: flex; gap: 4px; margin-bottom: 14px; padding: 4px; border-radius: 14px;
+  background: var(--card); box-shadow: var(--shadow); overflow-x: auto; scrollbar-width: none;
+}
+.seg::-webkit-scrollbar { display: none; }
+.seg button {
+  flex: 1 0 auto; border: 0; background: none; color: var(--muted); font: inherit; font-size: .82rem;
+  padding: 9px 10px; border-radius: 10px; cursor: pointer; white-space: nowrap;
+}
+.seg button.active { background: var(--primary); color: #fff; font-weight: 600; }
+
+.block-title { font-size: .85rem; margin: 14px 0 6px; color: var(--primary); }
+.ex-list { list-style: none; margin: 0 0 10px; padding: 0; }
+.ex-list li {
+  display: flex; gap: 10px; align-items: flex-start; padding: 10px 0;
+  border-bottom: 1px solid var(--line); cursor: pointer;
+}
+.ex-list li:last-child { border-bottom: 0; }
+.ex-body { flex: 1; min-width: 0; }
+.ex-top { display: flex; justify-content: space-between; gap: 8px; }
+.ex-top strong { font-size: .93rem; }
+.dose { white-space: nowrap; font-size: .82rem; font-weight: 600; color: var(--primary); }
+.ex-list small { display: block; margin-top: 3px; line-height: 1.35; }
+
+.check {
+  flex: none; width: 22px; height: 22px; border-radius: 7px; border: 2px solid var(--line);
+  display: inline-flex; align-items: center; justify-content: center; margin-top: 1px;
+}
+.done > .check, .done .meal-head .check { background: var(--primary); border-color: var(--primary); }
+.done > .check::after, .done .meal-head .check::after { content: '✓'; color: #fff; font-size: .8rem; font-weight: 700; }
+.ex-list li.done .ex-top strong { text-decoration: line-through; color: var(--muted); }
+
+.meal { border: 1px solid var(--line); border-radius: 14px; padding: 10px 12px; margin-bottom: 10px; }
+.meal.done { border-color: var(--primary); background: var(--primary-soft); }
+.meal-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.meal-head[data-meal] { cursor: pointer; }
+.meal-head strong { flex: 1; }
+.meal-head .muted { font-size: .8rem; }
+.food-list { list-style: none; margin: 8px 0 0; padding: 0; font-size: .88rem; }
+.food-list li { display: flex; justify-content: space-between; gap: 10px; padding: 3px 0; }
+.food-list li span:last-child { white-space: nowrap; font-weight: 600; }
+
+.chips { display: flex; gap: 6px; margin-bottom: 8px; }
+.chips button {
+  flex: 1; padding: 8px 0; border-radius: 10px; border: 1px solid var(--line);
+  background: var(--bg); color: var(--text); font: inherit; font-size: .85rem; cursor: pointer;
+}
+.chips button.active { background: var(--primary); border-color: var(--primary); color: #fff; font-weight: 600; }
+
+.tips { margin: 0; padding-left: 18px; font-size: .88rem; line-height: 1.5; }
+.tips li { margin-bottom: 6px; }
+.tip.left { text-align: left; }
+
+.legend { display: flex; gap: 16px; justify-content: center; margin-top: 8px; color: var(--muted); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend i { display: inline-block; width: 18px; height: 0; border-top: 2px dashed var(--muted); }
+.legend i.solid { border-top: 3px solid var(--primary); }
+
+.weeks { list-style: none; margin: 0; padding: 0; }
+.weeks li { padding: 10px 12px; border-radius: 12px; margin-bottom: 6px; border: 1px solid var(--line); }
+.weeks li.current { border-color: var(--primary); background: var(--primary-soft); }
+.wk-head { display: flex; align-items: baseline; gap: 8px; }
+.wk-head .wk-target { margin-left: auto; font-weight: 700; color: var(--primary); }
+.wk-meta { margin: 2px 0 4px; }

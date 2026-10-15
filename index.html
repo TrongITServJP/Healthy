@@ -23,6 +23,7 @@
     <div class="date-nav">
       <button class="icon-btn" id="prev-day" aria-label="Ngày trước">‹</button>
       <button class="icon-btn" id="next-day" aria-label="Ngày sau">›</button>
+      <button class="icon-btn small-icon" data-go="settings" aria-label="Cài đặt">⚙️</button>
     </div>
   </header>
 
@@ -42,6 +43,15 @@
         </div>
         <p id="score-tip" class="tip"></p>
       </div>
+
+      <button class="card plan-card" data-go="plan">
+        <span class="stat-icon">🎯</span>
+        <div>
+          <strong id="home-plan-title">Kế hoạch 90 ngày</strong>
+          <small class="muted" id="home-plan-detail"></small>
+        </div>
+        <span class="chev">›</span>
+      </button>
 
       <div class="grid">
         <button class="stat" data-go="water">
@@ -73,6 +83,147 @@
       <div class="card">
         <h2>7 ngày gần nhất · Nước uống</h2>
         <div class="week" id="week-chart"></div>
+      </div>
+    </section>
+
+    <!-- Kế hoạch 90 ngày -->
+    <section class="view" id="view-plan">
+      <div class="card plan-hero">
+        <div class="plan-top">
+          <div>
+            <strong id="plan-header"></strong>
+            <div class="muted small" id="plan-phase"></div>
+          </div>
+          <div class="plan-goal">
+            <span class="muted small">Mục tiêu tuần</span>
+            <strong id="plan-week-target"></strong>
+          </div>
+        </div>
+        <div class="bar"><i id="plan-progress"></i></div>
+        <div class="kpis">
+          <div><strong id="plan-kcal"></strong><span>kcal/ngày</span></div>
+          <div><strong id="plan-protein"></strong><span>đạm</span></div>
+          <div><strong id="plan-steps"></strong><span>bước/ngày</span></div>
+        </div>
+        <p class="focus" id="plan-focus"></p>
+        <p class="status" id="plan-status"></p>
+      </div>
+
+      <div class="seg">
+        <button data-sub="today" class="active">Hôm nay</button>
+        <button data-sub="menu">Thực đơn</button>
+        <button data-sub="road">Lộ trình</button>
+        <button data-sub="heel">Gót chân</button>
+        <button data-sub="setup">Thiết lập</button>
+      </div>
+
+      <div class="sub" id="sub-today">
+        <div class="card">
+          <h2 id="plan-workout-title"></h2>
+          <div id="plan-workout"></div>
+        </div>
+        <div class="card">
+          <h2>Thực đơn hôm nay <span class="muted small" id="plan-menu-sum"></span></h2>
+          <p class="muted small">Chạm vào bữa ăn để đánh dấu đã ăn.</p>
+          <div id="plan-menu"></div>
+        </div>
+      </div>
+
+      <div class="sub" id="sub-menu" hidden>
+        <div class="card">
+          <div class="chips" id="menu-days"></div>
+          <p class="muted small" id="menu-week-sum"></p>
+          <div id="menu-week"></div>
+        </div>
+        <div class="card">
+          <h2>Mẹo ăn uống</h2>
+          <ul class="tips">
+            <li><strong>Đong cơm:</strong> 1 bát con vơi ≈ 100 g, 1 bát con đầy ≈ 150 g cơm chín. Lượng tinh bột tự giảm theo từng giai đoạn.</li>
+            <li><strong>Đổi món tương đương (~23 g đạm):</strong> 100 g ức gà = 110 g thịt heo nạc = 150 g cá basa = 90 g cá ngừ hộp = 100 g tôm = 280 g đậu phụ.</li>
+            <li><strong>Rau:</strong> ăn thoải mái, nên có rau trong mọi bữa chính để no lâu.</li>
+            <li><strong>Cách nấu:</strong> luộc, hấp, kho nhạt, áp chảo ít dầu. Tránh chiên rán, mỡ, da gà, nước sốt ngọt.</li>
+            <li><strong>Đồ uống:</strong> 2,5–3 lít nước/ngày. Trà, cà phê đen không đường được. Bỏ nước ngọt, trà sữa, bia rượu.</li>
+            <li><strong>Muối:</strong> hạn chế nước chấm, mì gói, đồ hộp mặn — giúp giảm tích nước, cân nặng ổn định hơn.</li>
+            <li><strong>Đói giữa bữa:</strong> dưa leo, cà chua, rau luộc, trà không đường.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="sub" id="sub-road" hidden>
+        <div class="card">
+          <h2>Lộ trình cân nặng</h2>
+          <canvas id="plan-chart" height="200"></canvas>
+          <div class="legend small"><span><i class="dash"></i>Kế hoạch</span><span><i class="solid"></i>Thực tế</span></div>
+        </div>
+        <div class="card">
+          <h2>Mục tiêu từng tuần</h2>
+          <ul class="weeks" id="road-table"></ul>
+        </div>
+      </div>
+
+      <div class="sub" id="sub-heel" hidden>
+        <div class="card">
+          <h2>Chăm sóc gót chân · mỗi ngày</h2>
+          <p class="muted small">Làm buổi sáng khi vừa ngủ dậy và sau buổi tập. Chạm để đánh dấu.</p>
+          <ul class="ex-list" id="heel-list"></ul>
+        </div>
+        <div class="card">
+          <h2>Nguyên tắc khi bị viêm gót chân</h2>
+          <ul class="tips">
+            <li>Luôn đi giày/dép có đệm gót, kể cả trong nhà. Không đi chân đất trên sàn cứng.</li>
+            <li>Không nhảy, không chạy trong 90 ngày này. Mọi bài cardio đều có một chân chạm sàn.</li>
+            <li>Tập trên thảm. Đau ≤ 3/10 và sáng hôm sau không nặng hơn thì tiếp tục.</li>
+            <li>Đau &gt; 3/10 hoặc sáng hôm sau đau hơn: giảm bước chân 30–50%, đổi bài đứng sang bài nằm/ngồi.</li>
+            <li>Chườm đá 10–15 phút sau khi đi bộ nhiều.</li>
+            <li>Giảm cân sẽ giảm tải cho gót chân — cơn đau thường đỡ dần theo cân nặng.</li>
+            <li><strong>Đi khám</strong> nếu đau không đỡ sau 2–3 tuần, sưng nóng đỏ, tê bì hoặc đau cả khi nghỉ.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="sub" id="sub-setup" hidden>
+        <div class="card">
+          <h2>Thông tin của bạn</h2>
+          <form id="plan-form" class="form">
+            <label>Ngày bắt đầu
+              <input type="date" name="start" required>
+            </label>
+            <div class="row">
+              <label>Giới tính
+                <select name="sex"><option value="male">Nam</option><option value="female">Nữ</option></select>
+              </label>
+              <label>Tuổi
+                <input type="number" name="age" min="15" max="90" inputmode="numeric" required>
+              </label>
+            </div>
+            <div class="row">
+              <label>Chiều cao (cm)
+                <input type="number" name="height" min="120" max="230" step="0.1" inputmode="decimal" required>
+              </label>
+              <label>Cân lúc bắt đầu (kg)
+                <input type="number" name="weight" min="35" max="300" step="0.1" inputmode="decimal" required>
+              </label>
+            </div>
+            <label>Mục tiêu sau 90 ngày (kg)
+              <input type="number" name="goal" min="35" max="300" step="0.1" inputmode="decimal" required>
+            </label>
+            <button class="btn primary block" type="submit">Cập nhật kế hoạch</button>
+          </form>
+        </div>
+        <div class="card">
+          <h2>Chỉ số tính toán</h2>
+          <ul class="list" id="plan-calc"></ul>
+          <p class="warn" id="plan-pace-warn" hidden>⚠️ Mục tiêu này cần giảm hơn 1,2% cân nặng mỗi tuần. Calo sẽ không xuống dưới mức an toàn, nên có thể không đạt kịp — hãy chọn mục tiêu thực tế hơn.</p>
+        </div>
+        <div class="card">
+          <h2>An toàn</h2>
+          <ul class="tips">
+            <li>Nên kiểm tra sức khỏe trước khi bắt đầu (huyết áp, đường huyết, mỡ máu).</li>
+            <li>Không ăn dưới 1.500 kcal (nam) / 1.200 kcal (nữ) khi không có bác sĩ theo dõi — dễ mất cơ, mệt, rụng tóc và tăng nguy cơ sỏi mật.</li>
+            <li>Dừng tập và đi khám nếu đau ngực, chóng mặt, khó thở bất thường hoặc tim đập loạn.</li>
+            <li>2 tuần đầu thường giảm nhanh 2–4 kg (chủ yếu là nước) — sau đó chậm lại là bình thường.</li>
+          </ul>
+        </div>
       </div>
     </section>
 
@@ -112,6 +263,7 @@
               <option value="swim" data-met="7">🏊 Bơi</option>
               <option value="yoga" data-met="2.5">🧘 Yoga</option>
               <option value="gym" data-met="5">🏋️ Tập gym</option>
+              <option value="home" data-met="5">🔥 Tập tại nhà</option>
             </select>
           </label>
           <label>Thời gian (phút)
@@ -214,15 +366,17 @@
 
   <nav class="tabbar">
     <button data-go="home" class="active"><span>🏠</span>Tổng quan</button>
+    <button data-go="plan"><span>🎯</span>Kế hoạch</button>
     <button data-go="water"><span>💧</span>Nước</button>
     <button data-go="activity"><span>🏃</span>Vận động</button>
     <button data-go="sleep"><span>😴</span>Ngủ</button>
     <button data-go="weight"><span>⚖️</span>BMI</button>
-    <button data-go="settings"><span>⚙️</span>Cài đặt</button>
   </nav>
 
   <div class="toast" id="toast"></div>
 
+  <script src="js/plan-data.js"></script>
   <script src="js/app.js"></script>
+  <script src="js/plan.js"></script>
 </body>
 </html>

@@ -5,7 +5,7 @@
   const RING_LENGTH = 326.7;
   const ACTIVITY_NAMES = {
     walk: '🚶 Đi bộ', run: '🏃 Chạy bộ', bike: '🚴 Đạp xe',
-    swim: '🏊 Bơi', yoga: '🧘 Yoga', gym: '🏋️ Tập gym'
+    swim: '🏊 Bơi', yoga: '🧘 Yoga', gym: '🏋️ Tập gym', home: '🔥 Tập tại nhà'
   };
   const WEEKDAYS = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
 
@@ -23,7 +23,7 @@
       const raw = localStorage.getItem(STORAGE_KEY);
       if (!raw) return defaults();
       const data = JSON.parse(raw);
-      return { settings: { ...defaults().settings, ...data.settings }, days: data.days || {} };
+      return { ...data, settings: { ...defaults().settings, ...data.settings }, days: data.days || {} };
     } catch {
       return defaults();
     }
@@ -89,11 +89,15 @@
   }
 
   // ---------- Điều hướng ----------
+  const renderHooks = [];
+  const viewHooks = [];
+
   function go(view) {
     $$('.view').forEach((v) => v.classList.toggle('active', v.id === `view-${view}`));
     $$('.tabbar button').forEach((b) => b.classList.toggle('active', b.dataset.go === view));
     window.scrollTo({ top: 0 });
     if (view === 'weight') drawWeightChart();
+    viewHooks.forEach((fn) => fn(view));
   }
 
   $$('[data-go]').forEach((el) => el.addEventListener('click', () => go(el.dataset.go)));
@@ -186,7 +190,7 @@
     try {
       const data = JSON.parse(await file.text());
       if (!data.days) throw new Error('invalid');
-      state = { settings: { ...defaults().settings, ...data.settings }, days: data.days };
+      state = { ...data, settings: { ...defaults().settings, ...data.settings }, days: data.days };
       save(); render();
       toast('Đã nhập dữ liệu');
     } catch {
@@ -285,6 +289,8 @@
     st.waterGoal.value = s.waterGoal;
     st.activityGoal.value = s.activityGoal;
     st.sleepGoal.value = s.sleepGoal;
+
+    renderHooks.forEach((fn) => fn());
   }
 
   function renderList(sel, items, tpl, emptyText) {
@@ -392,7 +398,22 @@
     if (!document.hidden && currentDate > todayKey()) { currentDate = todayKey(); render(); }
   });
 
+  // API dùng chung cho các module khác (plan.js)
+  window.Healthy = {
+    get state() { return state; },
+    save, day, peekDay, todayKey, parseKey, shiftKey, latestWeight, toast, render, go,
+    currentDate: () => currentDate,
+    onRender: (fn) => renderHooks.push(fn),
+    onView: (fn) => viewHooks.push(fn)
+  };
+
   render();
+
+  // Mở thẳng một tab qua đường dẫn, ví dụ .../Healthy/#plan
+  window.addEventListener('load', () => {
+    const v = location.hash.slice(1);
+    if (v && document.getElementById(`view-${v}`)) go(v);
+  });
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
