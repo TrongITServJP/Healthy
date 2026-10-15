@@ -73,7 +73,7 @@ window.PLAN_DATA = (() => {
       'Bữa sáng': [['yenmach', 50], ['suatuoi', 180], ['trung', 100], ['suachua', 100]],
       'Bữa trưa': [['gaolut', 180], ['ucga', 200], ['rau', 250], ['dau', 5]],
       'Bữa phụ':  [['oi', 150], ['suadauna', 250]],
-      'Bữa tối':  [['khoailang', 200], ['caro', 220], ['rau', 250], ['dau', 5]]
+      'Bữa tối':  [['khoailang', 200], ['canuc', 220], ['rau', 250], ['dau', 5]]
     }
   ];
 
@@ -202,90 +202,98 @@ window.PLAN_DATA = (() => {
   //  keep:  { mode: nơi bảo quản, days: số ngày dùng tốt kể từ ngày mua, freeze: số ngày nếu cấp đông }
   //  pop:   mức độ phổ biến 1–3 · pantry: đồ khô mua theo tháng
   const MARKET = {
-    com:       { buy: 'Gạo tẻ', cat: 'Tinh bột', price: 20000, per: 1000, unit: 'kg', yield: 2.3, pantry: true, pop: 3, where: 'Chợ, siêu thị, tạp hóa',
+    com:       { buy: 'Gạo tẻ', cat: 'Tinh bột', price: 20000, per: 1000, unit: 'kg', yield: 2.3, pantry: true, pop: 3, stores: ['bhx', 'emart'],
                  keep: { mode: 'Khô ráo', days: 180, freeze: 0 }, tip: 'Đựng thùng kín, tránh ẩm mốc, mọt.' },
-    gaolut:    { buy: 'Gạo lứt', cat: 'Tinh bột', price: 35000, per: 1000, unit: 'kg', yield: 2.5, pantry: true, pop: 2, where: 'Siêu thị, tạp hóa',
+    gaolut:    { buy: 'Gạo lứt', cat: 'Tinh bột', price: 35000, per: 1000, unit: 'kg', yield: 2.5, pantry: true, pop: 2, stores: ['bhx', 'emart'],
                  keep: { mode: 'Khô ráo', days: 90, freeze: 0 }, tip: 'Ngâm 2–4 tiếng trước khi nấu cho mềm.' },
-    yenmach:   { buy: 'Yến mạch cán', cat: 'Tinh bột', price: 110000, per: 1000, unit: 'kg', yield: 1, pantry: true, pop: 2, where: 'Siêu thị, tạp hóa',
+    yenmach:   { buy: 'Yến mạch cán', cat: 'Tinh bột', price: 110000, per: 1000, unit: 'kg', yield: 1, pantry: true, pop: 2, stores: ['bhx', 'emart'],
                  keep: { mode: 'Khô ráo', days: 180, freeze: 0 }, tip: 'Kẹp kín miệng túi sau khi mở.' },
-    khoailang: { buy: 'Khoai lang', cat: 'Tinh bột', price: 25000, per: 1000, unit: 'kg', yield: 1, pop: 3, where: 'Chợ, siêu thị',
+    khoailang: { buy: 'Khoai lang', cat: 'Tinh bột', price: 25000, per: 1000, unit: 'kg', yield: 1, pop: 3, stores: ['bhx', 'cho'],
                  keep: { mode: 'Nơi thoáng mát', days: 14, freeze: 0 }, tip: 'Không để tủ lạnh, tránh nơi ẩm để không mọc mầm.' },
-    banhmi:    { buy: 'Bánh mì', cat: 'Tinh bột', price: 5000, per: 80, unit: 'ổ', yield: 1, pop: 3, where: 'Lò bánh mì, tạp hóa',
+    banhmi:    { buy: 'Bánh mì', cat: 'Tinh bột', price: 5000, per: 80, unit: 'ổ', yield: 1, pop: 3, stores: ['tiem', 'emart'],
                  keep: { mode: 'Nhiệt độ phòng', days: 1, freeze: 30 }, tip: 'Ăn trong ngày; để ngăn đá rồi nướng lại 3–5 phút.',
                  freezeNote: 'cấp đông ngay, nướng lại 3–5 phút trước khi ăn (hoặc mua bánh mới hôm đó)' },
-    bun:       { buy: 'Bún tươi', cat: 'Tinh bột', price: 15000, per: 1000, unit: 'kg', yield: 1, pop: 3, where: 'Chợ',
+    bun:       { buy: 'Bún tươi', cat: 'Tinh bột', price: 15000, per: 1000, unit: 'kg', yield: 1, pop: 3, stores: ['bhx', 'cho'],
                  keep: { mode: 'Ngăn mát', days: 1, freeze: 0 }, tip: 'Rất nhanh chua — mua đúng ngày ăn, trụng nước sôi trước khi ăn.' },
-    ngo:       { buy: 'Ngô (bắp)', cat: 'Tinh bột', price: 30000, per: 1000, unit: 'kg', yield: 0.6, pop: 3, where: 'Chợ', extra: true,
+    ngo:       { buy: 'Ngô (bắp)', cat: 'Tinh bột', price: 30000, per: 1000, unit: 'kg', yield: 0.6, pop: 3, stores: ['bhx', 'cho'], extra: true,
                  keep: { mode: 'Ngăn mát', days: 2, freeze: 60 }, tip: 'Luộc xong ăn trong ngày; 1 bắp ≈ 150 g hạt.' },
-    khoaitay:  { buy: 'Khoai tây', cat: 'Tinh bột', price: 25000, per: 1000, unit: 'kg', yield: 0.9, pop: 3, where: 'Chợ, siêu thị', extra: true,
+    khoaitay:  { buy: 'Khoai tây', cat: 'Tinh bột', price: 25000, per: 1000, unit: 'kg', yield: 0.9, pop: 3, stores: ['bhx', 'emart'], extra: true,
                  keep: { mode: 'Nơi tối, thoáng', days: 21, freeze: 0 }, tip: 'Bỏ củ mọc mầm hoặc vỏ xanh.' },
-    dauden:    { buy: 'Đậu đen', cat: 'Đồ khô', price: 50000, per: 1000, unit: 'kg', yield: 1, pantry: true, pop: 2, where: 'Chợ, siêu thị', extra: true,
+    dauden:    { buy: 'Đậu đen', cat: 'Đồ khô', price: 50000, per: 1000, unit: 'kg', yield: 1, pantry: true, pop: 2, stores: ['bhx', 'emart'], extra: true,
                  keep: { mode: 'Khô ráo', days: 180, freeze: 0 }, tip: 'Nấu chè/cháo ít đường; ngâm qua đêm cho nhanh mềm.' },
 
-    ucga:      { buy: 'Ức gà phi lê', cat: 'Thịt, cá, trứng', price: 80000, per: 1000, unit: 'kg', yield: 1, pop: 3, where: 'Chợ, siêu thị',
+    ucga:      { buy: 'Ức gà phi lê', cat: 'Thịt, cá, trứng', price: 80000, per: 1000, unit: 'kg', yield: 1, pop: 3, stores: ['bhx', 'emart'],
                  keep: { mode: 'Ngăn mát', days: 2, freeze: 90 }, tip: 'Chia túi theo bữa rồi cấp đông; rã đông ngăn mát qua đêm.' },
-    duiga:     { buy: 'Đùi gà (góc tư)', cat: 'Thịt, cá, trứng', price: 60000, per: 1000, unit: 'kg', yield: 0.7, pop: 3, where: 'Chợ, siêu thị', extra: true,
+    duiga:     { buy: 'Đùi gà (góc tư)', cat: 'Thịt, cá, trứng', price: 60000, per: 1000, unit: 'kg', yield: 0.7, pop: 3, stores: ['bhx', 'emart'], extra: true,
                  keep: { mode: 'Ngăn mát', days: 2, freeze: 90 }, tip: 'Rẻ hơn ức gà; lột bỏ da trước khi nấu.' },
-    heonac:    { buy: 'Thịt heo thăn', cat: 'Thịt, cá, trứng', price: 130000, per: 1000, unit: 'kg', yield: 1, pop: 3, where: 'Chợ, siêu thị',
+    heonac:    { buy: 'Thịt heo thăn', cat: 'Thịt, cá, trứng', price: 140000, per: 1000, unit: 'kg', yield: 1, pop: 3, stores: ['bhx', 'emart', 'cho'],
                  keep: { mode: 'Ngăn mát', days: 2, freeze: 90 }, tip: 'Chọn miếng hồng tươi, ít mỡ; chia túi cấp đông.' },
-    heovai:    { buy: 'Thịt heo nạc vai', cat: 'Thịt, cá, trứng', price: 115000, per: 1000, unit: 'kg', yield: 1, pop: 3, where: 'Chợ, siêu thị', extra: true,
+    heovai:    { buy: 'Thịt heo nạc vai', cat: 'Thịt, cá, trứng', price: 135000, per: 1000, unit: 'kg', yield: 1, pop: 3, stores: ['bhx', 'emart', 'cho'], extra: true,
                  keep: { mode: 'Ngăn mát', days: 2, freeze: 90 }, tip: 'Mềm hơn thăn, béo hơn một chút — lọc bớt mỡ.' },
-    bonac:     { buy: 'Thịt bò nạc', cat: 'Thịt, cá, trứng', price: 250000, per: 1000, unit: 'kg', yield: 1, pop: 2, where: 'Chợ, siêu thị',
+    bonac:     { buy: 'Thịt bò nạc', cat: 'Thịt, cá, trứng', price: 250000, per: 1000, unit: 'kg', yield: 1, pop: 2, stores: ['emart', 'bhx'],
                  keep: { mode: 'Ngăn mát', days: 2, freeze: 90 }, tip: 'Bò đông lạnh nhập khẩu ở siêu thị rẻ hơn bò tươi.' },
-    basa:      { buy: 'Cá basa phi lê', cat: 'Thịt, cá, trứng', price: 70000, per: 1000, unit: 'kg', yield: 1, pop: 3, where: 'Chợ, siêu thị',
+    basa:      { buy: 'Cá basa phi lê', cat: 'Thịt, cá, trứng', price: 80000, per: 1000, unit: 'kg', yield: 1, pop: 3, stores: ['bhx', 'emart'],
                  keep: { mode: 'Ngăn mát', days: 1, freeze: 90 }, tip: 'Thường bán sẵn đông lạnh — cất ngăn đá ngay khi về.' },
-    canuc:     { buy: 'Cá nục', cat: 'Thịt, cá, trứng', price: 60000, per: 1000, unit: 'kg', yield: 0.6, pop: 3, where: 'Chợ', extra: true,
-                 keep: { mode: 'Ngăn mát', days: 1, freeze: 60 }, tip: 'Kho/hấp; nhờ người bán làm sạch, bỏ đầu ruột.' },
-    caro:      { buy: 'Cá rô phi', cat: 'Thịt, cá, trứng', price: 50000, per: 1000, unit: 'kg', yield: 0.45, pop: 3, where: 'Chợ', extra: true,
+    canuc:     { buy: 'Cá nục làm sạch', cat: 'Thịt, cá, trứng', price: 77000, per: 1000, unit: 'kg', yield: 0.7, pop: 3, stores: ['bhx', 'cho'], extra: true,
+                 keep: { mode: 'Ngăn mát', days: 1, freeze: 60 }, tip: 'BHX bán khay cá nục đã làm sạch (~550 g) — tiện, rẻ. Kho cà chua hoặc hấp.' },
+    caro:      { buy: 'Cá rô phi', cat: 'Thịt, cá, trứng', price: 50000, per: 1000, unit: 'kg', yield: 0.45, pop: 3, stores: ['emart', 'cho'], extra: true,
                  keep: { mode: 'Ngăn mát', days: 1, freeze: 60 }, tip: 'Mua cá còn sống, nhờ làm sạch; hấp gừng rất ít calo.' },
-    cangu:     { buy: 'Cá ngừ hộp ngâm nước', cat: 'Thịt, cá, trứng', price: 32000, per: 120, unit: 'hộp', yield: 1, pop: 2, where: 'Siêu thị, tạp hóa',
+    cangu:     { buy: 'Cá ngừ hộp ngâm nước', cat: 'Thịt, cá, trứng', price: 32000, per: 120, unit: 'hộp', yield: 1, pop: 2, stores: ['bhx', 'emart'],
                  keep: { mode: 'Nhiệt độ phòng', days: 365, freeze: 0 }, tip: 'Chọn loại ngâm nước, không ngâm dầu. Đã mở thì để ngăn mát, dùng trong 2 ngày.' },
-    tom:       { buy: 'Tôm thẻ', cat: 'Thịt, cá, trứng', price: 200000, per: 1000, unit: 'kg', yield: 1, pop: 2, where: 'Chợ, siêu thị',
+    tom:       { buy: 'Tôm thẻ', cat: 'Thịt, cá, trứng', price: 200000, per: 1000, unit: 'kg', yield: 1, pop: 2, stores: ['bhx', 'emart', 'cho'],
                  keep: { mode: 'Ngăn mát', days: 1, freeze: 90 }, tip: 'Món đắt nhất thực đơn — có thể đổi bằng ức gà để tiết kiệm.' },
-    cathu:     { buy: 'Cá thu (cắt khúc)', cat: 'Thịt, cá, trứng', price: 250000, per: 1000, unit: 'kg', yield: 0.85, pop: 2, where: 'Chợ, siêu thị',
+    cathu:     { buy: 'Cá thu (cắt khúc)', cat: 'Thịt, cá, trứng', price: 250000, per: 1000, unit: 'kg', yield: 0.85, pop: 2, stores: ['emart', 'cho'],
                  keep: { mode: 'Ngăn mát', days: 1, freeze: 90 }, tip: 'Giàu omega-3 tốt cho tim mạch; kho nhạt hoặc áp chảo ít dầu.' },
-    muc:       { buy: 'Mực ống', cat: 'Thịt, cá, trứng', price: 220000, per: 1000, unit: 'kg', yield: 0.8, pop: 2, where: 'Chợ, siêu thị',
+    muc:       { buy: 'Mực ống', cat: 'Thịt, cá, trứng', price: 220000, per: 1000, unit: 'kg', yield: 0.8, pop: 2, stores: ['emart', 'cho'],
                  keep: { mode: 'Ngăn mát', days: 1, freeze: 90 }, tip: 'Rất ít béo, nhiều đạm; hấp gừng hoặc xào rau. Nhờ người bán làm sạch.' },
-    trung:     { buy: 'Trứng gà', cat: 'Thịt, cá, trứng', price: 3200, per: 50, unit: 'quả', yield: 1, pop: 3, where: 'Chợ, siêu thị, tạp hóa',
+    trung:     { buy: 'Trứng gà', cat: 'Thịt, cá, trứng', price: 2600, per: 50, unit: 'quả', yield: 1, pop: 3, stores: ['bhx', 'emart'],
                  keep: { mode: 'Ngăn mát', days: 21, freeze: 0 }, tip: 'Không rửa trước khi cất, để đầu nhọn xuống dưới.' },
-    dauphu:    { buy: 'Đậu phụ', cat: 'Thịt, cá, trứng', price: 20000, per: 1000, unit: 'kg', yield: 1, pop: 3, where: 'Chợ',
+    dauphu:    { buy: 'Đậu phụ', cat: 'Thịt, cá, trứng', price: 20000, per: 1000, unit: 'kg', yield: 1, pop: 3, stores: ['bhx', 'cho'],
                  keep: { mode: 'Ngăn mát', days: 2, freeze: 0 }, tip: 'Ngâm nước muối loãng trong hộp kín, thay nước mỗi ngày.' },
 
-    suachua:   { buy: 'Sữa chua không đường', cat: 'Sữa', price: 6500, per: 100, unit: 'hộp', yield: 1, pop: 3, where: 'Siêu thị, tạp hóa',
-                 keep: { mode: 'Ngăn mát', days: 20, freeze: 0 }, tip: 'Xem hạn in trên hộp.' },
-    suatuoi:   { buy: 'Sữa tươi không đường', cat: 'Sữa', price: 34000, per: 1000, unit: 'L', yield: 1, pop: 3, where: 'Siêu thị, tạp hóa',
+    suachua:   { buy: 'Sữa chua không đường / ít đường', cat: 'Sữa', price: 7000, per: 100, unit: 'hộp', yield: 1, pop: 3, stores: ['bhx', 'emart'],
+                 keep: { mode: 'Ngăn mát', days: 20, freeze: 0 }, tip: 'Ưu tiên loại "không đường"; không có thì chọn "ít đường". Tránh loại có đường. Xem hạn trên hộp.' },
+    suatuoi:   { buy: 'Sữa tươi không đường', cat: 'Sữa', price: 34000, per: 1000, unit: 'L', yield: 1, pop: 3, stores: ['bhx', 'emart'],
                  keep: { mode: 'Nhiệt độ phòng', days: 90, freeze: 0 }, tip: 'Hộp tiệt trùng để ngoài được; đã mở thì ngăn mát, dùng trong 2–3 ngày.' },
-    suadauna:  { buy: 'Sữa đậu nành không đường', cat: 'Sữa', price: 30000, per: 1000, unit: 'L', yield: 1, pop: 2, where: 'Siêu thị, chợ', extra: true,
+    suadauna:  { buy: 'Sữa đậu nành không đường', cat: 'Sữa', price: 30000, per: 1000, unit: 'L', yield: 1, pop: 2, stores: ['bhx', 'emart'], extra: true,
                  keep: { mode: 'Ngăn mát', days: 2, freeze: 0 }, tip: 'Loại nấu tại chợ chỉ để được 1–2 ngày.' },
 
-    rau:       { buy: 'Rau xanh các loại', cat: 'Rau củ', price: 20000, per: 1000, unit: 'kg', yield: 1, pop: 3, where: 'Chợ',
+    rau:       { buy: 'Rau xanh các loại', cat: 'Rau củ', price: 20000, per: 1000, unit: 'kg', yield: 1, pop: 3, stores: ['bhx', 'cho'],
                  keep: { mode: 'Ngăn mát', days: 3, freeze: 0 }, tip: 'Ngày 1–2 ăn rau lá (muống, cải, mồng tơi); ngày 3 dùng rau để lâu (bắp cải, bí xanh, su su).' },
-    salad:     { buy: 'Dưa leo + cà chua', cat: 'Rau củ', price: 22000, per: 1000, unit: 'kg', yield: 1, pop: 3, where: 'Chợ, siêu thị',
+    salad:     { buy: 'Dưa leo + cà chua', cat: 'Rau củ', price: 22000, per: 1000, unit: 'kg', yield: 1, pop: 3, stores: ['bhx', 'cho'],
                  keep: { mode: 'Ngăn mát', days: 6, freeze: 0 }, tip: 'Cà chua chín để ngoài, chưa chín hẳn để ngăn mát.' },
-    giado:     { buy: 'Giá đỗ', cat: 'Rau củ', price: 20000, per: 1000, unit: 'kg', yield: 1, pop: 3, where: 'Chợ', extra: true,
+    giado:     { buy: 'Giá đỗ', cat: 'Rau củ', price: 20000, per: 1000, unit: 'kg', yield: 1, pop: 3, stores: ['bhx', 'cho'], extra: true,
                  keep: { mode: 'Ngăn mát', days: 1, freeze: 0 }, tip: 'Mua trong ngày, chần chín trước khi ăn.' },
-    bido:      { buy: 'Bí đỏ', cat: 'Rau củ', price: 20000, per: 1000, unit: 'kg', yield: 0.85, pop: 3, where: 'Chợ, siêu thị', extra: true,
+    bido:      { buy: 'Bí đỏ', cat: 'Rau củ', price: 20000, per: 1000, unit: 'kg', yield: 0.85, pop: 3, stores: ['bhx', 'cho'], extra: true,
                  keep: { mode: 'Nơi thoáng mát', days: 30, freeze: 0 }, tip: 'Nguyên quả để rất lâu; đã cắt thì bọc kín, ngăn mát 3–4 ngày.' },
-    carot:     { buy: 'Cà rốt', cat: 'Rau củ', price: 20000, per: 1000, unit: 'kg', yield: 0.9, pop: 3, where: 'Chợ, siêu thị', extra: true,
+    carot:     { buy: 'Cà rốt', cat: 'Rau củ', price: 20000, per: 1000, unit: 'kg', yield: 0.9, pop: 3, stores: ['bhx', 'cho'], extra: true,
                  keep: { mode: 'Ngăn mát', days: 14, freeze: 0 }, tip: 'Cắt bỏ phần lá, cho vào túi kín.' },
 
-    chuoi:     { buy: 'Chuối', cat: 'Trái cây', price: 2000, per: 100, unit: 'quả', yield: 1, pop: 3, where: 'Chợ, siêu thị',
+    chuoi:     { buy: 'Chuối', cat: 'Trái cây', price: 2000, per: 100, unit: 'quả', yield: 1, pop: 3, stores: ['bhx', 'cho'],
                  keep: { mode: 'Nhiệt độ phòng', days: 4, freeze: 0 }, tip: 'Chọn nải có quả chín và quả hơi xanh để ăn dần.' },
-    oi:        { buy: 'Ổi', cat: 'Trái cây', price: 25000, per: 1000, unit: 'kg', yield: 1, pop: 3, where: 'Chợ, siêu thị',
+    oi:        { buy: 'Ổi', cat: 'Trái cây', price: 25000, per: 1000, unit: 'kg', yield: 1, pop: 3, stores: ['bhx', 'cho'],
                  keep: { mode: 'Ngăn mát', days: 6, freeze: 0 }, tip: 'Rất nhiều vitamin C, ít calo, no lâu.' },
-    tao:       { buy: 'Táo', cat: 'Trái cây', price: 50000, per: 1000, unit: 'kg', yield: 1, pop: 2, where: 'Chợ, siêu thị',
+    tao:       { buy: 'Táo', cat: 'Trái cây', price: 50000, per: 1000, unit: 'kg', yield: 1, pop: 2, stores: ['bhx', 'emart'],
                  keep: { mode: 'Ngăn mát', days: 21, freeze: 0 }, tip: 'Để riêng, không để chung với rau lá.' },
-    dudu:      { buy: 'Đu đủ', cat: 'Trái cây', price: 20000, per: 1000, unit: 'kg', yield: 0.75, pop: 3, where: 'Chợ',
+    dudu:      { buy: 'Đu đủ', cat: 'Trái cây', price: 20000, per: 1000, unit: 'kg', yield: 0.75, pop: 3, stores: ['bhx', 'cho'],
                  keep: { mode: 'Nhiệt độ phòng', days: 3, freeze: 0 }, tip: 'Mua quả ương (vàng một phần) để ăn vào ngày 2–3.' },
 
-    dauphong:  { buy: 'Lạc rang', cat: 'Đồ khô', price: 80000, per: 1000, unit: 'kg', yield: 1, pantry: true, pop: 3, where: 'Chợ, tạp hóa',
+    dauphong:  { buy: 'Lạc rang', cat: 'Đồ khô', price: 80000, per: 1000, unit: 'kg', yield: 1, pantry: true, pop: 3, stores: ['bhx', 'emart'],
                  keep: { mode: 'Hũ kín', days: 60, freeze: 0 }, tip: 'Đong đúng 15 g mỗi lần — rất dễ ăn quá tay.' },
-    dau:       { buy: 'Dầu ăn', cat: 'Đồ khô', price: 55000, per: 1000, unit: 'L', yield: 1, pantry: true, pop: 3, where: 'Chợ, siêu thị, tạp hóa',
+    dau:       { buy: 'Dầu ăn', cat: 'Đồ khô', price: 55000, per: 1000, unit: 'L', yield: 1, pantry: true, pop: 3, stores: ['bhx', 'emart'],
                  keep: { mode: 'Nơi tối, mát', days: 365, freeze: 0 }, tip: 'Dùng thìa cà phê để đong, không rót trực tiếp.' }
+  };
+
+  // Nơi mua quanh Bình Thạnh (Phan Văn Trị, Nơ Trang Long). Thứ tự trong `stores` = ưu tiên.
+  const STORES = {
+    bhx:   { name: 'Bách Hóa Xanh', short: 'BHX', note: 'Nhiều cửa hàng dọc Phan Văn Trị, Nơ Trang Long — tiện mua hằng ngày, có app đặt giao.' },
+    emart: { name: 'Emart Phan Văn Trị', short: 'Emart', note: 'Siêu thị lớn đường Phan Văn Trị (Gò Vấp) — quầy hải sản tươi, thịt bò, bánh mì.' },
+    cho:   { name: 'Chợ Bà Chiểu', short: 'Chợ Bà Chiểu', note: 'Chợ truyền thống Bình Thạnh — cá, mực, rau tươi, mặc cả được.' },
+    tiem:  { name: 'Tiệm bánh mì gần nhà', short: 'Tiệm bánh mì', note: 'Mua buổi sáng, bánh mới ra lò.' }
   };
 
   const MARKET_CATS = ['Thịt, cá, trứng', 'Rau củ', 'Trái cây', 'Sữa', 'Tinh bột', 'Đồ khô'];
   const TRIP_DAYS = 3;
 
-  return { FOODS, MARKET, MARKET_CATS, TRIP_DAYS, MENUS, EXERCISES, HEEL_ROUTINE, SCHEDULE, PHASES, TIMED, WEEKLY_LOSS_SHAPE, WEEKS };
+  return { FOODS, MARKET, MARKET_CATS, STORES, TRIP_DAYS, MENUS, EXERCISES, HEEL_ROUTINE, SCHEDULE, PHASES, TIMED, WEEKLY_LOSS_SHAPE, WEEKS };
 })();

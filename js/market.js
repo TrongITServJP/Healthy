@@ -7,11 +7,16 @@
   if (!H || !HP || !D) return;
 
   const $ = (sel) => document.querySelector(sel);
+  const $$ = (sel) => document.querySelectorAll(sel);
   const WEEKDAYS = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
   const fmtDate = (key) => { const d = H.parseKey(key); return `${WEEKDAYS[d.getDay()]} ${d.getDate()}/${d.getMonth() + 1}`; };
   const vnd = HP.fmtVnd;
 
   let tripKey = null;
+  let groupBy = 'store';
+  try { groupBy = localStorage.getItem('healthy-trip-group') || 'store'; } catch { /* bỏ qua */ }
+
+  const storesLabel = (m) => m.stores.map((x) => D.STORES[x].short).join(' · ');
 
   function trips() {
     const p = HP.data();
@@ -83,7 +88,7 @@
         mainOffs = usedOn.filter((i) => i < m.keep.days);
         const g = late.reduce((a, i) => a + it.uses[i], 0);
         const q = quantity(m, g, it.id);
-        extra.push({ id: it.id, name: m.buy, label: q.label, cost: q.g * price / m.per,
+        extra.push({ id: it.id, name: m.buy, label: q.label, cost: q.g * price / m.per, store: m.stores[0],
           note: `🛒 Mua vào ${fmtDate(trip.days[late[0]].key)} · chỉ để được ${m.keep.days} ngày.` });
       }
 
@@ -91,9 +96,11 @@
         const g = mainOffs.reduce((a, i) => a + it.uses[i], 0);
         const q = quantity(m, g, it.id);
         if (!note && m.keep.days <= 2) note = `⏱ ${keepLabel(m.keep)} — ăn trước, đừng để lâu.`;
-        main.push({ id: it.id, cat: m.cat, name: m.buy, label: q.label, cost: q.g * price / m.per, note, where: m.where });
+        main.push({ id: it.id, cat: m.cat, store: m.stores[0], name: m.buy, label: q.label, cost: q.g * price / m.per, note, where: `🏪 ${storesLabel(m)}` });
       }
     });
+    // Trong mỗi cửa hàng, xếp theo nhóm hàng để đi theo quầy
+    main.sort((a, b) => D.MARKET_CATS.indexOf(a.cat) - D.MARKET_CATS.indexOf(b.cat));
     return { main, extra, pantry };
   }
 
@@ -103,7 +110,7 @@
       <span class="check"></span>
       <div class="ex-body">
         <div class="ex-top"><strong>${r.name}</strong><span class="dose">${r.label}</span></div>
-        <div class="buy-meta"><small class="muted">${r.note || r.where || ''}</small><small class="price">${vnd(r.cost)}</small></div>
+        <div class="buy-meta"><small class="muted">${[r.note, r.where].filter(Boolean).join('<br>')}</small><small class="price">${vnd(r.cost)}</small></div>
       </div>
     </li>`;
   }
@@ -133,12 +140,16 @@
 
     const boughtCount = main.filter((r) => done.includes(r.id)).length;
     $('#trip-count').textContent = `${boughtCount}/${main.length}`;
-    $('#trip-list').innerHTML = D.MARKET_CATS.map((cat) => {
-      const rows = main.filter((r) => r.cat === cat);
-      if (!rows.length) return '';
-      const sub = rows.reduce((a, r) => a + r.cost, 0);
-      return `<h3 class="block-title">${cat} <span class="muted">· ${vnd(sub)}</span></h3>
-        <ul class="ex-list">${rows.map((r) => rowHtml(r, r.id, done)).join('')}</ul>`;
+    $$('#trip-group button').forEach((b) => b.classList.toggle('active', b.dataset.group === groupBy));
+    const groups = groupBy === 'store'
+      ? Object.keys(D.STORES).map((k) => ({ title: D.STORES[k].name, note: D.STORES[k].note, rows: main.filter((r) => r.store === k) }))
+      : D.MARKET_CATS.map((cat) => ({ title: cat, rows: main.filter((r) => r.cat === cat) }));
+    $('#trip-list').innerHTML = groups.map((g) => {
+      if (!g.rows.length) return '';
+      const sub = g.rows.reduce((a, r) => a + r.cost, 0);
+      return `<h3 class="block-title">${g.title} <span class="muted">· ${g.rows.length} món · ${vnd(sub)}</span></h3>
+        ${g.note ? `<p class="muted small group-note">${g.note}</p>` : ''}
+        <ul class="ex-list">${g.rows.map((r) => rowHtml(r, r.id, done)).join('')}</ul>`;
     }).join('');
 
     $('#trip-extra-card').hidden = !extra.length;
@@ -174,7 +185,7 @@
             <span class="muted small">đ/${unitLabel}</span>
           </div>
           <small class="muted">${f.kcal} kcal · ${f.p} g đạm /100 g ăn được${value}</small>
-          <small class="muted">📍 ${m.where} · 🧊 ${keepLabel(m.keep)}</small>
+          <small class="muted">🏪 ${storesLabel(m)} · 🧊 ${keepLabel(m.keep)}</small>
           <small>${m.tip}</small>
         </li>`;
       }).join('')}</ul>`;
@@ -191,6 +202,13 @@
       const i = list.indexOf(k);
       i >= 0 ? list.splice(i, 1) : list.push(k);
       H.save(); render();
+      return;
+    }
+    const grp = t.closest('[data-group]');
+    if (grp) {
+      groupBy = grp.dataset.group;
+      try { localStorage.setItem('healthy-trip-group', groupBy); } catch { /* bỏ qua */ }
+      render();
       return;
     }
     if (t.closest('#trip-prev')) { tripKey = H.shiftKey(tripKey, -D.TRIP_DAYS); render(); return; }
