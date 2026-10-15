@@ -108,6 +108,7 @@
   function rowHtml(r, key, done) {
     return `<li class="${done.includes(key) ? 'done' : ''}" data-buy="${key}">
       <span class="check"></span>
+      <img class="food-img" src="img/food/${r.id}.jpg" alt="" loading="lazy" width="34" height="34">
       <div class="ex-body">
         <div class="ex-top"><strong>${r.name}</strong><span class="dose">${r.label}</span></div>
         <div class="buy-meta"><small class="muted">${[r.note, r.where].filter(Boolean).join('<br>')}</small><small class="price">${vnd(r.cost)}</small></div>
@@ -181,6 +182,7 @@
         const unitLabel = m.unit === 'kg' || m.unit === 'L' ? m.unit : m.unit;
         return `<li>
           <div class="cat-top">
+            <img class="food-img lg" src="img/food/${id}.jpg" alt="" loading="lazy" width="48" height="48">
             <strong>${m.buy}</strong>
             <span class="stars" title="Mức độ phổ biến">${'★'.repeat(m.pop)}${'☆'.repeat(3 - m.pop)}</span>
             <span class="tag ${inMenu.has(id) ? 'on' : ''}">${inMenu.has(id) ? 'Trong thực đơn' : 'Đổi món'}</span>

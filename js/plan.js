@@ -93,6 +93,11 @@
   // Dùng khi hiển thị: chỉ đọc, không tạo bản ghi rỗng cho mỗi ngày được xem
   const peekLog = (key) => plan().log[key] || EMPTY_LOG;
 
+  // ---------- Hình ảnh ----------
+  const foodImg = (id) => `<img class="food-img" src="img/food/${id}.jpg" alt="" loading="lazy" width="34" height="34">`;
+  // Hình động tác (chạm để phóng to); không có figures.js thì bỏ qua
+  const figure = (fn) => (window.FIGURES ? `<span class="fig-wrap" title="Chạm để phóng to">${fn(window.FIGURES)}</span>` : '');
+
   // ---------- Giá ----------
   const fmtVnd = (n) => `${(Math.round(n / 500) * 500).toLocaleString('vi-VN')}đ`;
 
@@ -157,7 +162,7 @@
           <span class="muted">${Math.round(m.kcal)} kcal · ${Math.round(m.p)} g đạm · <b class="price">${fmtVnd(m.cost)}</b></span>
         </div>
         <ul class="food-list">
-          ${m.rows.map((r) => `<li><span>${r.name}</span><span>${r.amount}</span></li>`).join('')}
+          ${m.rows.map((r) => `<li>${foodImg(r.id)}<span class="fname">${r.name}</span><span>${r.amount}</span></li>`).join('')}
         </ul>
       </div>`).join('');
   }
@@ -167,7 +172,7 @@
     const s = D.SCHEDULE[weekday];
     const P = D.PHASES[phase];
     const exName = (id) => D.EXERCISES[id].name[phase];
-    const out = { title: s.title, kind: s.kind, note: s.note, minutes: s.kind === 'rest' ? 0 : P.minutes, blocks: [] };
+    const out = { title: s.title, kind: s.kind, note: s.note, phase, minutes: s.kind === 'rest' ? 0 : P.minutes, blocks: [] };
 
     if (s.kind === 'strength') {
       out.blocks.push({
@@ -206,6 +211,7 @@
           const i = idx++;
           return `<li class="${done.includes(i) ? 'done' : ''}" data-ex="${i}">
             <span class="check"></span>
+            ${figure((F) => F.exercise(it.id, w.phase, it.name))}
             <div class="ex-body">
               <div class="ex-top"><strong>${it.name}</strong><span class="dose">${it.dose}</span></div>
               <small class="muted">${it.cue}</small>
@@ -283,6 +289,7 @@
     $('#heel-list').innerHTML = D.HEEL_ROUTINE.map((h, i) => `
       <li class="${heelDone.includes(i) ? 'done' : ''}" data-heel="${i}">
         <span class="check"></span>
+        ${figure((F) => F.heel(i, h.name))}
         <div class="ex-body">
           <div class="ex-top"><strong>${h.name}</strong><span class="dose">${h.dose}</span></div>
           <small class="muted">${h.cue}</small>
@@ -415,6 +422,9 @@
 
     const key = H.currentDate();
     const toggle = (arr, v) => { const i = arr.indexOf(v); i >= 0 ? arr.splice(i, 1) : arr.push(v); };
+
+    const fig = t.closest('.fig-wrap');
+    if (fig) { fig.closest('li').classList.toggle('zoom'); return; }
 
     const ex = t.closest('[data-ex]');
     if (ex) { toggle(dayLog(key).ex, Number(ex.dataset.ex)); H.save(); render(); return; }

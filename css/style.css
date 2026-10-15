@@ -318,3 +318,29 @@ canvas { width: 100%; display: block; }
 .banner .btn-row { justify-content: flex-start; margin: 0; }
 
 #sync-status { white-space: pre-line; }
+
+/* ---------- Hình minh họa ---------- */
+.fig { width: 84px; height: 70px; flex: none; background: var(--bg); border-radius: 10px; }
+.fig polyline { fill: none; stroke-linecap: round; stroke-linejoin: round; stroke-width: 4.5; }
+.fig .fig-near { stroke: var(--text); }
+.fig .fig-far { stroke: var(--muted); opacity: .6; }
+.fig-head { fill: var(--text); }
+.fig-floor { stroke: var(--line); stroke-width: 2; }
+.fig-mat { fill: var(--primary); opacity: .35; }
+.fig-prop { fill: var(--line); }
+.fig-prop-line { stroke: var(--muted); stroke-width: 3; fill: none; stroke-linecap: round; opacity: .7; }
+.fig .fig-towel-line { stroke: #f59e0b; stroke-width: 2.5; }
+.fig-towel { fill: #fcd34d; }
+.fig-bottle { fill: #60a5fa; }
+
+/* Ảnh thực phẩm & hình bài tập trong danh sách */
+.food-img { width: 34px; height: 34px; border-radius: 8px; object-fit: cover; flex: none; background: var(--line); }
+.food-img.lg { width: 48px; height: 48px; border-radius: 10px; }
+.food-list li { align-items: center; gap: 8px; padding: 4px 0; }
+.food-list .fname { flex: 1; min-width: 0; }
+.ex-list li > .food-img { margin-top: 0; }
+.fig-wrap { flex: none; cursor: zoom-in; display: flex; }
+.ex-list .fig { width: 76px; height: 63px; }
+.ex-list li.zoom { flex-wrap: wrap; }
+.ex-list li.zoom .fig-wrap { order: 5; width: 100%; cursor: zoom-out; }
+.ex-list li.zoom .fig { width: 100%; height: auto; aspect-ratio: 6 / 5; max-height: 280px; }
