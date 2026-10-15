@@ -68,6 +68,16 @@
     return Math.round(ms / 86400000) + 1;
   }
 
+  // Số buổi tập đã hoàn thành trong một tuần của kế hoạch
+  function sessionsInWeek(week) {
+    let n = 0;
+    for (let i = 0; i < 7; i++) {
+      const key = H.shiftKey(plan().profile.start, (week - 1) * 7 + i);
+      if (plan().log[key] && plan().log[key].logged) n++;
+    }
+    return n;
+  }
+
   const weekOf = (dayNum) => Math.min(13, Math.max(1, Math.ceil(dayNum / 7)));
   const phaseOf = (week) => (week <= 4 ? 1 : week <= 8 ? 2 : 3);
 
@@ -238,7 +248,7 @@
     $('#plan-progress').style.width = `${Math.max(0, Math.min(1, dayNum / PLAN_DAYS)) * 100}%`;
     $('#plan-kcal').textContent = kcal;
     $('#plan-protein').textContent = `${c.protein} g`;
-    $('#plan-steps').textContent = D.WEEKS[week - 1].steps.toLocaleString('vi-VN');
+    $('#plan-sessions').textContent = `${sessionsInWeek(week)}/6`;
     $('#plan-week-target').textContent = `${fmtKg(c.weekTargets[week])} kg`;
     $('#plan-focus').textContent = D.WEEKS[week - 1].focus;
     $('#plan-status').innerHTML = statusHtml(c);
@@ -315,8 +325,8 @@
     const head = `Đã giảm <strong>${fmtKg(lost)} kg</strong> (hiện ${fmtKg(actual)} kg). `;
     if (diff <= -1.5) return head + `Nhanh hơn lộ trình ${fmtKg(-diff)} kg 🚀 — giữ nguyên calo, đừng cắt thêm, ưu tiên đủ đạm để giữ cơ.`;
     if (diff <= 0.5) return head + 'Đúng lộ trình 👍 Tiếp tục duy trì.';
-    if (diff <= 1.5) return head + `Chậm hơn ${fmtKg(diff)} kg — thêm 1.000–1.500 bước/ngày và kiểm tra lại cân đong thức ăn.`;
-    return head + `Chậm hơn ${fmtKg(diff)} kg — nếu kéo dài 2 tuần: giảm 100 kcal (không dưới ${c.floor}) + thêm bước chân. Cân có thể dao động 1–2 kg do muối/nước.`;
+    if (diff <= 1.5) return head + `Chậm hơn ${fmtKg(diff)} kg — kiểm tra lại cân đong thức ăn, dầu ăn và đồ uống; đừng bỏ buổi tập nào.`;
+    return head + `Chậm hơn ${fmtKg(diff)} kg — nếu kéo dài 2 tuần: giảm 100 kcal (không dưới ${c.floor}) hoặc thêm 10 phút cardio tại nhà. Cân có thể dao động 1–2 kg do muối/nước.`;
   }
 
   function renderRoadmap(c, curWeek) {
@@ -332,7 +342,7 @@
           <span class="muted small">${fmtDate(from)}–${fmtDate(to)}</span>
           <span class="wk-target">${fmtKg(c.weekTargets[w])} kg</span>
         </div>
-        <div class="wk-meta muted small">GĐ${ph} · ${c.kcal[ph]} kcal · ${wk.steps.toLocaleString('vi-VN')} bước</div>
+        <div class="wk-meta muted small">GĐ${ph} · ${c.kcal[ph]} kcal · tập ${D.PHASES[ph].minutes} phút × 6 buổi</div>
         <div class="small">${wk.focus}</div>
       </li>`;
     }).join('');

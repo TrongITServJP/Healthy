@@ -14,19 +14,37 @@
 
   // ---------- Dữ liệu ----------
   const defaults = () => ({
-    settings: { waterGoal: 2000, activityGoal: 30, sleepGoal: 8, height: null },
+    settings: { waterGoal: 2800, activityGoal: 30, sleepGoal: 8, height: null },
     days: {}
   });
+
+  // Chuẩn hóa dữ liệu (từ máy, file JSON hoặc bản sao lưu Google Sheets)
+  function normalize(data) {
+    const settings = { ...defaults().settings, ...data.settings };
+    // Một lần: mục tiêu nước cũ mặc định 2.000 ml → 2.800 ml theo kế hoạch
+    if (!settings.waterMigrated) {
+      if (settings.waterGoal === 2000) settings.waterGoal = 2800;
+      settings.waterMigrated = true;
+    }
+    return { ...data, settings, days: data.days || {} };
+  }
 
   function load() {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) return defaults();
-      const data = JSON.parse(raw);
-      return { ...data, settings: { ...defaults().settings, ...data.settings }, days: data.days || {} };
+      return raw ? normalize(JSON.parse(raw)) : defaults();
     } catch {
       return defaults();
     }
+  }
+
+  // Thay toàn bộ dữ liệu; giữ bản cũ trong máy để phòng khi cần lấy lại
+  function replaceState(data) {
+    if (!data || !data.days) throw new Error('Dữ liệu không hợp lệ');
+    try { localStorage.setItem(`${STORAGE_KEY}-before-restore`, JSON.stringify(state)); } catch { /* bỏ qua */ }
+    state = normalize(data);
+    save();
+    render();
   }
 
   const saveHooks = [];
@@ -177,7 +195,7 @@
   $('#settings-form').addEventListener('submit', (e) => {
     e.preventDefault();
     const f = e.target;
-    state.settings.waterGoal = Number(f.waterGoal.value) || 2000;
+    state.settings.waterGoal = Number(f.waterGoal.value) || 2800;
     state.settings.activityGoal = Number(f.activityGoal.value) || 30;
     state.settings.sleepGoal = Number(f.sleepGoal.value) || 8;
     save(); render();
@@ -197,10 +215,7 @@
     const file = e.target.files[0];
     if (!file) return;
     try {
-      const data = JSON.parse(await file.text());
-      if (!data.days) throw new Error('invalid');
-      state = { ...data, settings: { ...defaults().settings, ...data.settings }, days: data.days };
-      save(); render();
+      replaceState(JSON.parse(await file.text()));
       toast('Đã nhập dữ liệu');
     } catch {
       toast('File không hợp lệ');
@@ -339,8 +354,8 @@
 
   function tipFor(pWater, pAct, sleep, score) {
     if (score >= 90) return 'Xuất sắc! Bạn đang có một ngày rất khỏe mạnh 💪';
-    if (pWater < 0.5) return 'Uống thêm nước nhé — cơ thể cần khoảng 2 lít mỗi ngày.';
-    if (pAct < 0.5) return 'Thử đi bộ nhanh 15 phút để tăng năng lượng.';
+    if (pWater < 0.5) return 'Uống thêm nước nhé — mục tiêu khoảng 2,8 lít mỗi ngày.';
+    if (pAct < 0.5) return 'Mở tab Kế hoạch và tập buổi hôm nay (30–45 phút tại nhà).';
     if (!sleep) return 'Đừng quên ghi lại giấc ngủ đêm qua.';
     return 'Bạn đang làm tốt, tiếp tục duy trì nhé!';
   }
@@ -422,7 +437,7 @@
   // API dùng chung cho các module khác (plan.js)
   window.Healthy = {
     get state() { return state; },
-    save, day, peekDay, todayKey, parseKey, shiftKey, latestWeight, toast, render, go,
+    save, day, peekDay, todayKey, parseKey, shiftKey, latestWeight, toast, render, go, replaceState,
     dayStats, bmiInfo, ACTIVITY_NAMES,
     currentDate: () => currentDate,
     onSave: (fn) => saveHooks.push(fn),
@@ -431,6 +446,37 @@
   };
 
   render();
+
+  // Gợi ý cài lên màn hình chính — trên iPhone, Safari có thể xóa dữ liệu web không dùng 7 ngày
+  (() => {
+    const card = $('#install-hint');
+    const standalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone;
+    let dismissed = false;
+    try { dismissed = localStorage.getItem('healthy-install-dismissed') === '1'; } catch { /* bỏ qua */ }
+    if (standalone || dismissed) return;
+    const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+    if (isIOS) {
+      $('#install-text').innerHTML = 'Trên iPhone: bấm nút <b>Chia sẻ</b> ⬆️ → <b>Thêm vào MH chính</b>. Dùng như app và không bị Safari xóa dữ liệu.';
+      card.hidden = false;
+    }
+    let prompt = null;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      prompt = e;
+      $('#install-btn').hidden = false;
+      card.hidden = false;
+    });
+    $('#install-btn').addEventListener('click', async () => {
+      if (!prompt) return;
+      prompt.prompt();
+      await prompt.userChoice;
+      card.hidden = true;
+    });
+    $('#install-dismiss').addEventListener('click', () => {
+      card.hidden = true;
+      try { localStorage.setItem('healthy-install-dismissed', '1'); } catch { /* bỏ qua */ }
+    });
+  })();
 
   // Mở thẳng một tab qua đường dẫn, ví dụ .../Healthy/#plan
   window.addEventListener('load', () => {

@@ -118,8 +118,8 @@ window.PLAN_DATA = (() => {
                  cue: 'Nằm ngửa, gập gối, cuộn vai lên khỏi sàn, không kéo cổ.' },
     legraise:  { name: { 1: 'Nằm nâng gối (gập gối)', 2: 'Nằm nâng chân thẳng (biên độ ngắn)', 3: 'Nằm nâng chân thẳng' },
                  cue: 'Lưng dưới ép sàn, hạ chân chậm. Tính số lần.' },
-    walk:      { name: { 1: 'Đi bộ nhẹ hoặc dậm chân theo nhạc', 2: 'Đi bộ nhanh vừa hoặc dậm chân + đấm bốc', 3: 'Đi bộ nhanh hoặc dậm chân nâng gối + đấm bốc' },
-                 cue: 'Cường độ vừa: thở nhanh nhưng vẫn nói được câu ngắn. Giày có đệm gót; đau gót > 3/10 thì chuyển sang bài tại chỗ trên thảm.' }
+    indoor:    { name: { 1: 'Dậm chân tại chỗ theo nhạc', 2: 'Dậm chân + đấm bốc theo nhạc', 3: 'Dậm chân nâng gối + đấm bốc theo nhạc' },
+                 cue: 'Tập trong nhà, trên thảm, đi giày. Cường độ vừa: thở nhanh nhưng vẫn nói được câu ngắn. Có thể vừa tập vừa xem phim cho đỡ chán.' }
   };
 
   // Bài chăm sóc gót chân — làm mỗi sáng khi ngủ dậy và sau buổi tập.
@@ -134,13 +134,13 @@ window.PLAN_DATA = (() => {
 
   // Lịch tập theo thứ (0 = CN). kind: strength | interval | steady | rest
   const SCHEDULE = [
-    { title: 'Nghỉ ngơi chủ động', kind: 'rest', note: 'Đi dạo nhẹ 15–20 phút nếu gót chân cho phép + làm bài chăm sóc gót chân.' },
+    { title: 'Nghỉ ngơi chủ động', kind: 'rest', note: 'Nghỉ ngơi: giãn cơ nhẹ 10 phút và làm bài chăm sóc gót chân. Không cần ra ngoài.' },
     { title: 'Sức mạnh A · Toàn thân', kind: 'strength', items: ['boxsquat', 'pushup', 'bridge', 'hinge', 'deadbug', 'plank'] },
     { title: 'Cardio ngắt quãng · Không nhảy', kind: 'interval', items: ['march', 'boxing', 'steptouch', 'kneeelbow', 'frontkick'], finisher: ['crunch', 'birddog'] },
     { title: 'Sức mạnh B · Toàn thân', kind: 'strength', items: ['wallsit', 'sumo', 'superman', 'pushup', 'birddog', 'sideplank', 'sideleg'] },
     { title: 'Cardio ngắt quãng + Bụng', kind: 'interval', items: ['boxing', 'march', 'kneeelbow', 'steptouch', 'frontkick'], finisher: ['legraise', 'deadbug', 'plank'] },
     { title: 'Sức mạnh A · Toàn thân', kind: 'strength', items: ['boxsquat', 'pushup', 'bridge', 'hinge', 'deadbug', 'plank'] },
-    { title: 'Cardio đều · Đốt mỡ', kind: 'steady', items: ['walk'] }
+    { title: 'Cardio đều trong nhà · Đốt mỡ', kind: 'steady', items: ['indoor'] }
   ];
 
   // Thông số theo giai đoạn
@@ -164,19 +164,19 @@ window.PLAN_DATA = (() => {
 
   // Mục tiêu và trọng tâm từng tuần
   const WEEKS = [
-    { steps: 5000, focus: 'Làm quen: tập đúng kỹ thuật, cân mỗi sáng sau khi đi vệ sinh, uống 2,5–3 lít nước/ngày.' },
-    { steps: 5500, focus: 'Bỏ hẳn nước ngọt, trà sữa, đồ chiên. Đong cơm bằng cân hoặc bát cố định.' },
-    { steps: 6000, focus: 'Ăn đủ đạm mỗi ngày (mỗi bữa chính có 1 phần thịt/cá/trứng/đậu). Ngủ đủ 7 tiếng trở lên.' },
-    { steps: 6500, focus: 'Đo vòng bụng + chụp ảnh tiến độ. Đánh giá gót chân: đau giảm thì tăng dần bước chân.' },
-    { steps: 7000, focus: 'Lên Giai đoạn 2: tập 3 vòng, giảm calo. Nấu sẵn đồ ăn 2–3 ngày một lần.' },
-    { steps: 7000, focus: 'Đi bộ 10 phút sau mỗi bữa chính (chia nhỏ để đỡ áp lực lên gót).' },
-    { steps: 7500, focus: 'Chuyển sang chống đẩy trên bàn/ghế. Ăn ngoài thì chọn cơm gà/cá, bỏ da, bớt cơm.' },
-    { steps: 7500, focus: 'Đo vòng bụng, so sánh ảnh. Nếu 2 tuần không giảm thì giảm thêm 100 kcal hoặc thêm 1.500 bước.' },
-    { steps: 8000, focus: 'Lên Giai đoạn 3: 4 vòng, xuống chậm 3 giây. Giữ đạm cao để không mất cơ.' },
-    { steps: 8000, focus: 'Hạn chế bia rượu và ăn khuya. Bữa tối xong trước 20h.' },
-    { steps: 8500, focus: 'Nếu chững cân: kiểm tra lại cách đong thức ăn, ngủ đủ, không bỏ buổi tập.' },
-    { steps: 8500, focus: 'Đo vòng bụng + ảnh. Dồn sức cho 2 tuần cuối, không cắt thêm calo.' },
-    { steps: 8500, focus: 'Về đích: cân, đo, chụp ảnh. Lập kế hoạch tiếp theo hướng tới 63 kg (tăng dần lên mức duy trì ~100 kcal/tuần nếu muốn nghỉ).' }
+    { focus: 'Làm quen: tập đúng kỹ thuật, cân mỗi sáng sau khi đi vệ sinh, uống 2,8 lít nước/ngày.' },
+    { focus: 'Bỏ hẳn nước ngọt, trà sữa, đồ chiên. Đong cơm bằng cân hoặc bát cố định.' },
+    { focus: 'Ăn đủ đạm mỗi ngày (mỗi bữa chính có 1 phần thịt/cá/trứng/đậu). Ngủ đủ 7 tiếng trở lên.' },
+    { focus: 'Đo vòng bụng + chụp ảnh tiến độ. Đánh giá gót chân: đau giảm thì có thể tập bài đứng lâu hơn.' },
+    { focus: 'Lên Giai đoạn 2: tập 3 vòng, giảm calo. Nấu sẵn đồ ăn 2–3 ngày một lần.' },
+    { focus: 'Ngồi làm việc lâu: cứ mỗi giờ đứng dậy đi lại trong nhà 2–3 phút, uống nước.' },
+    { focus: 'Chuyển sang chống đẩy trên bàn/ghế. Ăn ngoài thì chọn cơm gà/cá, bỏ da, bớt cơm.' },
+    { focus: 'Đo vòng bụng, so sánh ảnh. Nếu 2 tuần không giảm thì giảm thêm 100 kcal.' },
+    { focus: 'Lên Giai đoạn 3: 4 vòng, xuống chậm 3 giây. Giữ đạm cao để không mất cơ.' },
+    { focus: 'Hạn chế bia rượu và ăn khuya. Bữa tối xong trước 20h.' },
+    { focus: 'Nếu chững cân: kiểm tra lại cách đong thức ăn, ngủ đủ, không bỏ buổi tập.' },
+    { focus: 'Đo vòng bụng + ảnh. Dồn sức cho 2 tuần cuối, không cắt thêm calo.' },
+    { focus: 'Về đích: cân, đo, chụp ảnh. Lập kế hoạch tiếp theo hướng tới 63 kg (tăng dần lên mức duy trì ~100 kcal/tuần nếu muốn nghỉ).' }
   ];
 
   // Thực phẩm thay thế (không có trong thực đơn mẫu, dùng để đổi món khi đi chợ)

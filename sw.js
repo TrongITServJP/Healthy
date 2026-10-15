@@ -1,14 +1,14 @@
 // Tăng số phiên bản mỗi khi cập nhật file để điện thoại tải bản mới
-const CACHE = 'healthy-v8';
+const CACHE = 'healthy-v9';
 const ASSETS = [
   './',
   'index.html',
-  'css/style.css?v=8',
-  'js/plan-data.js?v=8',
-  'js/app.js?v=8',
-  'js/plan.js?v=8',
-  'js/market.js?v=8',
-  'js/sync.js?v=8',
+  'css/style.css?v=9',
+  'js/plan-data.js?v=9',
+  'js/app.js?v=9',
+  'js/plan.js?v=9',
+  'js/market.js?v=9',
+  'js/sync.js?v=9',
   'manifest.json',
   'icons/icon.svg',
   'icons/icon-192.png',

@@ -43,3 +43,10 @@ App ghi mỗi ngày một dòng vào sheet **Nhật ký** (cân nặng, BMI, nư
 5. Trong app: **⚙️ Cài đặt → Google Sheets** → dán URL + mã bảo mật → **Lưu & kiểm tra kết nối**.
 
 URL và mã bảo mật chỉ lưu trên thiết bị, không có trong repo. Làm bước 5 trên từng thiết bị muốn đồng bộ.
+
+**Sao lưu & khôi phục:** mỗi lần đồng bộ, app gửi kèm bản sao lưu đầy đủ vào sheet ẩn *Sao lưu*.
+Máy mới hoặc sau khi xóa trình duyệt: kết nối lại → app hỏi tải dữ liệu về. Khi một máy khác vừa cập nhật,
+app không ghi đè mà hiện thông báo để chọn *Tải về* hoặc *Giữ dữ liệu máy này*.
+
+**Cập nhật Apps Script** (khi `Code.gs` thay đổi): dán code mới → *Triển khai → Quản lý các lần triển khai* →
+✏️ → *Phiên bản: Phiên bản mới* → *Triển khai*. URL giữ nguyên.

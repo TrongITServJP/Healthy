@@ -7,13 +7,23 @@
   const KEY = 'healthy-sync';
   const DEBOUNCE_MS = 3000;
   const $ = (sel) => document.querySelector(sel);
+  const fmtTime = (ms) => {
+    const d = new Date(ms);
+    const p2 = (n) => String(n).padStart(2, '0');
+    return `${p2(d.getHours())}:${p2(d.getMinutes())} ${d.getDate()}/${d.getMonth() + 1}`;
+  };
+  const newId = () => Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
 
   // Cấu hình lưu riêng, không nằm trong dữ liệu sức khỏe (không bị xuất/xóa cùng)
+  //  device:     mã ngẫu nhiên của thiết bị này
+  //  remoteSeen: thời điểm bản sao lưu trên Sheets mà thiết bị này đã đồng bộ gần nhất
+  const blank = () => ({ url: '', token: '', auto: true, pending: [], last: null, error: null, device: newId(), remoteSeen: 0, oldScript: false });
+
   function loadCfg() {
     try {
-      return { url: '', token: '', auto: true, pending: [], last: null, error: null, ...JSON.parse(localStorage.getItem(KEY) || '{}') };
+      return { ...blank(), ...JSON.parse(localStorage.getItem(KEY) || '{}') };
     } catch {
-      return { url: '', token: '', auto: true, pending: [], last: null, error: null };
+      return blank();
     }
   }
   function saveCfg() {
@@ -21,8 +31,10 @@
   }
 
   let cfg = loadCfg();
+  saveCfg();
   let timer = null;
   let busy = false;
+  let suppress = false; // không đẩy lên Sheets khi đang khôi phục
 
   const connected = () => Boolean(cfg.url && cfg.token);
 
@@ -62,7 +74,7 @@
     return [...keys].filter((k) => k <= H.todayKey()).sort();
   }
 
-  // ---------- Gửi ----------
+  // ---------- Gửi / nhận ----------
   async function post(payload) {
     const res = await fetch(cfg.url, {
       method: 'POST',
@@ -72,19 +84,31 @@
     });
     const data = await res.json();
     if (!data.ok) throw new Error(data.error || 'Lỗi không rõ');
+    // Script cũ (chưa có sao lưu) không trả về version
+    cfg.oldScript = !data.version;
     return data;
   }
 
-  async function flush() {
-    if (!connected() || busy || !cfg.pending.length || !navigator.onLine) return;
+  // Gửi các ngày đang chờ + bản sao lưu đầy đủ
+  async function flush(force = false) {
+    if (!connected() || busy || !navigator.onLine) return;
+    if (!cfg.pending.length && !force) return;
     busy = true;
     const keys = [...cfg.pending];
     try {
       const profile = window.HealthyPlan ? window.HealthyPlan.profile() : null;
-      await post({ rows: keys.map(buildRow), profile });
+      const data = await post({
+        rows: keys.map(buildRow),
+        profile,
+        backup: JSON.stringify(H.state),
+        base: cfg.remoteSeen,
+        device: cfg.device
+      });
       cfg.pending = cfg.pending.filter((k) => !keys.includes(k));
-      cfg.last = new Date().toISOString();
+      cfg.last = Date.now();
       cfg.error = null;
+      if (data.backupAt) cfg.remoteSeen = data.backupAt;
+      if (data.conflict) showConflict(data.conflict);
     } catch (err) {
       cfg.error = String(err.message || err);
     }
@@ -101,7 +125,52 @@
     timer = setTimeout(flush, DEBOUNCE_MS);
   }
 
+  // Tải bản sao lưu từ Sheets về thay dữ liệu máy này
+  async function restore(ask = true) {
+    const data = await post({ action: 'pull' });
+    if (cfg.oldScript) throw new Error('Apps Script đang là bản cũ — hãy cập nhật code để dùng sao lưu');
+    const b = data.backup;
+    if (!b || !b.data) { H.toast('Trên Sheets chưa có bản sao lưu'); return false; }
+    if (ask && !confirm(`Thay toàn bộ dữ liệu trên máy này bằng bản sao lưu lúc ${fmtTime(b.updatedAt)}?`)) return false;
+    cfg.remoteSeen = b.updatedAt;
+    cfg.pending = [];
+    saveCfg();
+    suppress = true;
+    try { H.replaceState(JSON.parse(b.data)); } finally { suppress = false; }
+    hideBanner();
+    renderStatus();
+    H.toast('✅ Đã khôi phục dữ liệu từ Google Sheets');
+    return true;
+  }
+
+  // Kiểm tra máy khác có sao lưu mới hơn không (khi mở app)
+  async function checkRemote() {
+    if (!connected() || !navigator.onLine) return;
+    try {
+      const data = await post({ action: 'meta' });
+      const b = data.backup;
+      if (b && b.device !== cfg.device && b.updatedAt > cfg.remoteSeen) showConflict(b);
+    } catch { /* lỗi mạng: thử lại lần sau */ }
+    saveCfg();
+    renderStatus();
+  }
+
   // ---------- Giao diện ----------
+  function showConflict(b) {
+    const el = $('#sync-banner');
+    el.innerHTML = `
+      <p>☁️ Có dữ liệu mới hơn từ <b>thiết bị khác</b> (sao lưu lúc ${fmtTime(b.updatedAt)}).</p>
+      <div class="btn-row">
+        <button class="btn primary" data-sync="pull">Tải về máy này</button>
+        <button class="btn ghost" data-sync="keep" data-at="${Number(b.updatedAt)}">Giữ dữ liệu máy này</button>
+      </div>`;
+    el.hidden = false;
+  }
+
+  function hideBanner() {
+    $('#sync-banner').hidden = true;
+  }
+
   function renderStatus() {
     const el = $('#sync-status');
     if (!el) return;
@@ -112,12 +181,14 @@
       f.auto.checked = cfg.auto;
     }
     $('#sync-actions').hidden = !connected();
-    let text;
-    if (!connected()) text = 'Chưa kết nối.';
-    else if (cfg.error) text = `⚠️ Lỗi: ${cfg.error}${cfg.pending.length ? ` · ${cfg.pending.length} ngày đang chờ gửi` : ''}`;
-    else if (cfg.pending.length) text = `⏳ Đang chờ gửi ${cfg.pending.length} ngày…`;
-    else text = `✅ Đã kết nối${cfg.last ? ` · lần cuối ${new Date(cfg.last).toLocaleString('vi-VN')}` : ''}`;
-    el.textContent = text;
+    const lines = [];
+    if (!connected()) lines.push('Chưa kết nối.');
+    else if (cfg.error) lines.push(`⚠️ Lỗi: ${cfg.error}${cfg.pending.length ? ` · ${cfg.pending.length} ngày đang chờ gửi` : ''}`);
+    else if (cfg.pending.length) lines.push(`⏳ Đang chờ gửi ${cfg.pending.length} ngày…`);
+    else lines.push(`✅ Đã kết nối${cfg.last ? ` · gửi lần cuối ${fmtTime(cfg.last)}` : ''}`);
+    if (connected() && cfg.oldScript) lines.push('⚠️ Apps Script là bản cũ: vẫn ghi Nhật ký nhưng chưa sao lưu/khôi phục được. Hãy dán code mới và triển khai "Phiên bản mới".');
+    else if (connected() && cfg.remoteSeen) lines.push(`☁️ Sao lưu đầy đủ lúc ${fmtTime(cfg.remoteSeen)}`);
+    el.textContent = lines.join('\n');
   }
 
   $('#sync-form').addEventListener('submit', async (e) => {
@@ -134,9 +205,18 @@
     saveCfg();
     $('#sync-status').textContent = '⏳ Đang kiểm tra kết nối…';
     try {
-      await post({ rows: [] });
+      const data = await post({ action: 'meta' });
       cfg.error = null;
       H.toast('✅ Kết nối Google Sheets thành công');
+      const b = data.backup;
+      // Sheets đã có dữ liệu từ máy khác: hỏi trước khi ghi đè (máy mới, vừa cài lại…)
+      if (b && b.device !== cfg.device && b.updatedAt > cfg.remoteSeen) {
+        if (confirm(`Google Sheets đã có bản sao lưu lúc ${fmtTime(b.updatedAt)}.\n\nOK: tải dữ liệu đó về máy này.\nHủy: giữ dữ liệu máy này và ghi đè lên Sheets.`)) {
+          await restore(false);
+          return;
+        }
+        cfg.remoteSeen = b.updatedAt;
+      }
       queue(allKeys());
     } catch (err) {
       cfg.error = String(err.message || err);
@@ -146,26 +226,46 @@
     renderStatus();
   });
 
-  $('#sync-all').addEventListener('click', () => {
-    queue(allKeys());
-    clearTimeout(timer);
-    flush().then(() => H.toast(cfg.error ? 'Đồng bộ lỗi' : 'Đã đồng bộ toàn bộ'));
+  document.addEventListener('click', async (e) => {
+    const t = e.target;
+    const act = t.closest('[data-sync]');
+    if (act && act.dataset.sync === 'pull') {
+      try { await restore(false); } catch (err) { H.toast(String(err.message || err)); }
+      return;
+    }
+    if (act && act.dataset.sync === 'keep') {
+      cfg.remoteSeen = Number(act.dataset.at);
+      saveCfg();
+      hideBanner();
+      queue(allKeys());
+      H.toast('Sẽ ghi dữ liệu máy này lên Sheets');
+      return;
+    }
+    if (t.closest('#sync-restore')) {
+      try { await restore(true); } catch (err) { H.toast(String(err.message || err)); }
+      return;
+    }
+    if (t.closest('#sync-all')) {
+      queue(allKeys());
+      clearTimeout(timer);
+      flush().then(() => H.toast(cfg.error ? 'Đồng bộ lỗi' : 'Đã đồng bộ toàn bộ'));
+      return;
+    }
+    if (t.closest('#sync-off')) {
+      if (!confirm('Ngắt kết nối Google Sheets trên thiết bị này?')) return;
+      cfg = { ...blank(), device: cfg.device };
+      saveCfg();
+      renderStatus();
+    }
   });
 
-  $('#sync-off').addEventListener('click', () => {
-    if (!confirm('Ngắt kết nối Google Sheets trên thiết bị này?')) return;
-    cfg = { url: '', token: '', auto: true, pending: [], last: null, error: null };
-    saveCfg();
-    renderStatus();
-  });
-
-  // Mỗi lần lưu dữ liệu: gửi dòng của ngày đang xem (và hôm nay)
+  // Mỗi lần lưu dữ liệu: gửi dòng của ngày đang xem (và hôm nay) kèm bản sao lưu
   H.onSave(() => {
-    if (!connected() || !cfg.auto) return;
+    if (suppress || !connected() || !cfg.auto) return;
     queue([...new Set([H.currentDate(), H.todayKey()])]);
   });
 
-  window.addEventListener('online', flush);
+  window.addEventListener('online', () => flush());
   renderStatus();
-  flush();
+  checkRemote().then(() => flush());
 })();

@@ -12,7 +12,7 @@
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
-  <link rel="stylesheet" href="css/style.css?v=8">
+  <link rel="stylesheet" href="css/style.css?v=9">
 </head>
 <body>
   <header class="topbar">
@@ -30,6 +30,15 @@
   <main>
     <!-- Tổng quan -->
     <section class="view active" id="view-home">
+      <div class="card banner" id="sync-banner" hidden></div>
+
+      <div class="card banner" id="install-hint" hidden>
+        <p id="install-text">📲 Cài Healthy lên màn hình chính để dùng như app và giữ dữ liệu an toàn.</p>
+        <div class="btn-row">
+          <button class="btn primary" id="install-btn" hidden>Cài đặt ứng dụng</button>
+          <button class="btn ghost" id="install-dismiss">Để sau</button>
+        </div>
+      </div>
       <div class="card hero">
         <div class="ring-wrap">
           <svg viewBox="0 0 120 120" class="ring">
@@ -103,7 +112,7 @@
         <div class="kpis">
           <div><strong id="plan-kcal"></strong><span>kcal/ngày</span></div>
           <div><strong id="plan-protein"></strong><span>đạm</span></div>
-          <div><strong id="plan-steps"></strong><span>bước/ngày</span></div>
+          <div><strong id="plan-sessions"></strong><span>buổi tập tuần này</span></div>
         </div>
         <p class="focus" id="plan-focus"></p>
         <p class="status" id="plan-status"></p>
@@ -238,8 +247,8 @@
             <li>Luôn đi giày/dép có đệm gót, kể cả trong nhà. Không đi chân đất trên sàn cứng.</li>
             <li>Không nhảy, không chạy trong 90 ngày này. Mọi bài cardio đều có một chân chạm sàn.</li>
             <li>Tập trên thảm. Đau ≤ 3/10 và sáng hôm sau không nặng hơn thì tiếp tục.</li>
-            <li>Đau &gt; 3/10 hoặc sáng hôm sau đau hơn: giảm bước chân 30–50%, đổi bài đứng sang bài nằm/ngồi.</li>
-            <li>Chườm đá 10–15 phút sau khi đi bộ nhiều.</li>
+            <li>Đau &gt; 3/10 hoặc sáng hôm sau đau hơn: giảm cường độ, đổi bài đứng sang bài nằm/ngồi.</li>
+            <li>Chườm đá 10–15 phút sau buổi tập nếu gót chân đau.</li>
             <li>Giảm cân sẽ giảm tải cho gót chân — cơn đau thường đỡ dần theo cân nặng.</li>
             <li><strong>Đi khám</strong> nếu đau không đỡ sau 2–3 tuần, sưng nóng đỏ, tê bì hoặc đau cả khi nghỉ.</li>
           </ul>
@@ -299,7 +308,7 @@
           <div class="glass-fill" id="glass-fill"></div>
           <div class="glass-text">
             <strong id="water-total">0</strong>
-            <span>/ <span id="water-goal">2000</span> ml</span>
+            <span>/ <span id="water-goal">2800</span> ml</span>
           </div>
         </div>
         <div class="btn-row">
@@ -419,7 +428,7 @@
       </div>
       <div class="card">
         <h2>Google Sheets</h2>
-        <p class="muted small">Tự động ghi dữ liệu mỗi ngày (cân nặng, nước, vận động, giấc ngủ, kế hoạch) vào Google Sheet của bạn.</p>
+        <p class="muted small">Tự động ghi dữ liệu mỗi ngày vào Google Sheet và giữ một bản sao lưu đầy đủ — đổi máy hay xóa trình duyệt vẫn khôi phục được.</p>
         <form id="sync-form" class="form">
           <label>URL Web App (Apps Script)
             <input type="url" name="url" placeholder="https://script.google.com/macros/s/…/exec" autocomplete="off">
@@ -432,6 +441,7 @@
         </form>
         <div class="btn-row sync-actions" id="sync-actions" hidden>
           <button class="btn" id="sync-all">Đồng bộ toàn bộ</button>
+          <button class="btn" id="sync-restore">Khôi phục từ Sheets</button>
           <button class="btn ghost" id="sync-off">Ngắt kết nối</button>
         </div>
         <p class="status" id="sync-status"></p>
@@ -459,10 +469,10 @@
 
   <div class="toast" id="toast"></div>
 
-  <script src="js/plan-data.js?v=8"></script>
-  <script src="js/app.js?v=8"></script>
-  <script src="js/plan.js?v=8"></script>
-  <script src="js/market.js?v=8"></script>
-  <script src="js/sync.js?v=8"></script>
+  <script src="js/plan-data.js?v=9"></script>
+  <script src="js/app.js?v=9"></script>
+  <script src="js/plan.js?v=9"></script>
+  <script src="js/market.js?v=9"></script>
+  <script src="js/sync.js?v=9"></script>
 </body>
 </html>

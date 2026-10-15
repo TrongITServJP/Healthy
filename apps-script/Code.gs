@@ -1,7 +1,11 @@
 /**
  * Healthy → Google Sheets
  * Dán toàn bộ file này vào Google Sheet: Tiện ích mở rộng → Apps Script.
- * Nhận dữ liệu từ ứng dụng Healthy và ghi mỗi ngày một dòng vào sheet "Nhật ký".
+ * Nhận dữ liệu từ ứng dụng Healthy và ghi mỗi ngày một dòng vào sheet "Nhật ký",
+ * đồng thời giữ một bản sao lưu đầy đủ (sheet ẩn "Sao lưu") để khôi phục về app.
+ *
+ * Cập nhật code: Triển khai → Quản lý các lần triển khai → ✏️ Sửa → Phiên bản: "Phiên bản mới"
+ * → Triển khai (giữ nguyên URL, không cần nhập lại trong app).
  *
  * TOKEN là mã bảo mật: phải giống hệt mã nhập trong app (Cài đặt → Google Sheets).
  */
@@ -9,6 +13,8 @@ const TOKEN = 'DOI_THANH_MA_BAO_MAT_CUA_BAN';
 
 const LOG_SHEET = 'Nhật ký';
 const PROFILE_SHEET = 'Hồ sơ';
+const BACKUP_SHEET = 'Sao lưu';
+const CHUNK = 40000; // mỗi ô tối đa 50.000 ký tự
 
 // [khóa dữ liệu từ app, tiêu đề cột]
 const COLUMNS = [
@@ -42,12 +48,25 @@ function doPost(e) {
     const body = JSON.parse(e.postData.contents);
     if (body.token !== TOKEN) return json_({ ok: false, error: 'Sai mã bảo mật' });
 
+    if (body.action === 'meta') return json_({ ok: true, version: 2, backup: readBackup_(false) });
+    if (body.action === 'pull') return json_({ ok: true, version: 2, backup: readBackup_(true) });
+
     const lock = LockService.getScriptLock();
     lock.waitLock(15000);
     try {
       const count = upsertRows_(body.rows || []);
       if (body.profile) writeProfile_(body.profile);
-      return json_({ ok: true, count: count });
+      const res = { ok: true, version: 2, count: count };
+      if (body.backup) {
+        // Chặn ghi đè: thiết bị khác đã sao lưu sau lần đồng bộ gần nhất của thiết bị này
+        const meta = readBackup_(false);
+        if (meta && meta.device !== body.device && meta.updatedAt > (body.base || 0)) {
+          res.conflict = meta;
+        } else {
+          res.backupAt = writeBackup_(body.backup, body.device);
+        }
+      }
+      return json_(res);
     } finally {
       lock.releaseLock();
     }
@@ -84,6 +103,39 @@ function upsertRows_(rows) {
 
   if (sh.getLastRow() > 2) sh.getRange(2, 1, sh.getLastRow() - 1, COLUMNS.length).sort(1);
   return rows.length;
+}
+
+function backupSheet_() {
+  const ss = SpreadsheetApp.getActive();
+  let sh = ss.getSheetByName(BACKUP_SHEET);
+  if (!sh) {
+    sh = ss.insertSheet(BACKUP_SHEET);
+    sh.hideSheet();
+  }
+  return sh;
+}
+
+function writeBackup_(data, device) {
+  const sh = backupSheet_();
+  const at = Date.now();
+  const rows = [['updatedAt', at], ['device', device || ''], ['chunks', 0]];
+  for (let i = 0; i < data.length; i += CHUNK) rows.push([data.slice(i, i + CHUNK), '']);
+  rows[2][1] = rows.length - 3;
+  sh.clearContents();
+  sh.getRange(1, 1, rows.length, 2).setNumberFormat('@').setValues(rows);
+  return at;
+}
+
+function readBackup_(withData) {
+  const sh = SpreadsheetApp.getActive().getSheetByName(BACKUP_SHEET);
+  if (!sh || sh.getLastRow() < 3) return null;
+  const head = sh.getRange(1, 2, 3, 1).getValues();
+  const meta = { updatedAt: Number(head[0][0]), device: String(head[1][0]) };
+  const chunks = Number(head[2][0]);
+  if (withData && chunks > 0) {
+    meta.data = sh.getRange(4, 1, chunks, 1).getValues().map(function (r) { return r[0]; }).join('');
+  }
+  return meta;
 }
 
 function writeProfile_(profile) {
