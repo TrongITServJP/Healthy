@@ -18,7 +18,6 @@ window.PLAN_DATA = (() => {
     cangu:     { name: 'Cá ngừ hộp ngâm nước (ráo)',  kcal: 116, p: 26,  c: 0,   f: 1, unit: { n: 'hộp', g: 120 } },
     tom:       { name: 'Tôm',                         kcal: 99,  p: 24,  c: 0,   f: 0.3 },
     trung:     { name: 'Trứng gà',                    kcal: 143, p: 12.6, c: 0.7, f: 9.5, unit: { n: 'quả', g: 50 } },
-    longtrang: { name: 'Lòng trắng trứng',            kcal: 52,  p: 11,  c: 0.7, f: 0.2, unit: { n: 'lòng trắng', g: 33 } },
     dauphu:    { name: 'Đậu phụ',                     kcal: 76,  p: 8,   c: 1.9, f: 4.8 },
     suachua:   { name: 'Sữa chua không đường',        kcal: 62,  p: 4.5, c: 4.5, f: 3,   unit: { n: 'hộp', g: 100 } },
     suatuoi:   { name: 'Sữa tươi không đường',   kcal: 62,  p: 3.2, c: 4.8, f: 3.4 },
@@ -35,31 +34,31 @@ window.PLAN_DATA = (() => {
   // Thực đơn mẫu theo thứ trong tuần (0 = Chủ nhật). Khẩu phần tinh bột là mức gốc, app tự điều chỉnh theo giai đoạn.
   const MENUS = [
     { // CN
-      'Bữa sáng': [['khoailang', 200], ['trung', 100], ['longtrang', 66], ['suatuoi', 180]],
+      'Bữa sáng': [['khoailang', 200], ['trung', 150], ['suatuoi', 180]],
       'Bữa trưa': [['com', 180], ['bonac', 150], ['rau', 250], ['dau', 5]],
       'Bữa phụ':  [['suachua', 100], ['chuoi', 100]],
       'Bữa tối':  [['com', 120], ['cangu', 120], ['dauphu', 150], ['rau', 250]]
     },
     { // T2
-      'Bữa sáng': [['yenmach', 50], ['suatuoi', 180], ['trung', 100], ['longtrang', 66]],
+      'Bữa sáng': [['yenmach', 50], ['suatuoi', 180], ['trung', 150]],
       'Bữa trưa': [['com', 180], ['ucga', 200], ['rau', 250], ['dau', 5]],
       'Bữa phụ':  [['suachua', 100], ['oi', 150]],
       'Bữa tối':  [['com', 120], ['basa', 200], ['dauphu', 100], ['rau', 200], ['dau', 5]]
     },
     { // T3
-      'Bữa sáng': [['banhmi', 80], ['trung', 100], ['longtrang', 66], ['salad', 150], ['dau', 5]],
+      'Bữa sáng': [['banhmi', 80], ['trung', 150], ['salad', 150], ['dau', 5]],
       'Bữa trưa': [['com', 180], ['heonac', 180], ['rau', 250]],
       'Bữa phụ':  [['suatuoi', 220], ['chuoi', 100]],
       'Bữa tối':  [['com', 120], ['cangu', 120], ['dauphu', 150], ['salad', 150], ['dau', 5]]
     },
     { // T4
-      'Bữa sáng': [['khoailang', 200], ['trung', 100], ['longtrang', 66], ['suachua', 100]],
+      'Bữa sáng': [['khoailang', 200], ['trung', 150], ['suachua', 100]],
       'Bữa trưa': [['bun', 200], ['ucga', 170], ['rau', 200], ['dau', 5]],
       'Bữa phụ':  [['oi', 150], ['dauphong', 15]],
       'Bữa tối':  [['com', 120], ['tom', 200], ['rau', 250], ['dau', 5]]
     },
     { // T5
-      'Bữa sáng': [['yenmach', 50], ['suachua', 100], ['chuoi', 100], ['trung', 100], ['longtrang', 66]],
+      'Bữa sáng': [['yenmach', 50], ['suachua', 100], ['chuoi', 100], ['trung', 150]],
       'Bữa trưa': [['com', 180], ['basa', 220], ['dauphu', 100], ['rau', 250], ['dau', 5]],
       'Bữa phụ':  [['suatuoi', 220], ['tao', 150]],
       'Bữa tối':  [['com', 100], ['ucga', 200], ['salad', 200], ['dau', 5]]
@@ -71,7 +70,7 @@ window.PLAN_DATA = (() => {
       'Bữa tối':  [['com', 120], ['trung', 100], ['dauphu', 150], ['rau', 200], ['dau', 5]]
     },
     { // T7
-      'Bữa sáng': [['yenmach', 50], ['suatuoi', 180], ['trung', 100], ['longtrang', 66]],
+      'Bữa sáng': [['yenmach', 50], ['suatuoi', 180], ['trung', 150]],
       'Bữa trưa': [['gaolut', 180], ['ucga', 200], ['rau', 250], ['dau', 5]],
       'Bữa phụ':  [['suachua', 100], ['oi', 150]],
       'Bữa tối':  [['khoailang', 200], ['basa', 220], ['rau', 250], ['dau', 5]]
@@ -243,8 +242,6 @@ window.PLAN_DATA = (() => {
                  keep: { mode: 'Ngăn mát', days: 1, freeze: 90 }, tip: 'Món đắt nhất thực đơn — có thể đổi bằng ức gà để tiết kiệm.' },
     trung:     { buy: 'Trứng gà', cat: 'Thịt, cá, trứng', price: 3200, per: 50, unit: 'quả', yield: 1, pop: 3, where: 'Chợ, siêu thị, tạp hóa',
                  keep: { mode: 'Ngăn mát', days: 21, freeze: 0 }, tip: 'Không rửa trước khi cất, để đầu nhọn xuống dưới.' },
-    longtrang: { buyAs: 'trung', ratio: 50 / 33, cat: 'Thịt, cá, trứng', pop: 3,
-                 tip: 'Tách từ trứng gà (1 quả = 1 lòng trắng). Lòng đỏ dư có thể cho người nhà dùng.' },
     dauphu:    { buy: 'Đậu phụ', cat: 'Thịt, cá, trứng', price: 20000, per: 1000, unit: 'kg', yield: 1, pop: 3, where: 'Chợ',
                  keep: { mode: 'Ngăn mát', days: 2, freeze: 0 }, tip: 'Ngâm nước muối loãng trong hộp kín, thay nước mỗi ngày.' },
 
