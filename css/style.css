@@ -278,3 +278,9 @@ canvas { width: 100%; display: block; }
 .wk-head { display: flex; align-items: baseline; gap: 8px; }
 .wk-head .wk-target { margin-left: auto; font-weight: 700; color: var(--primary); }
 .wk-meta { margin: 2px 0 4px; }
+
+/* Google Sheets */
+.form label.inline { flex-direction: row; align-items: center; gap: 10px; color: var(--text); font-size: .9rem; }
+.form label.inline input { width: 20px; height: 20px; accent-color: var(--primary); }
+.sync-actions { margin-top: 10px; justify-content: flex-start; }
+.warn a { color: inherit; font-weight: 700; }

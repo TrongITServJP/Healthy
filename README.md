@@ -31,3 +31,15 @@ python -m http.server 8000
 
 Sửa file → `git commit` → `git push`. GitHub Pages tự triển khai lại sau khoảng 1 phút.
 Khi đổi file, tăng `CACHE` trong `sw.js` (ví dụ `healthy-v2`) để điện thoại nhận bản mới.
+
+## Đồng bộ Google Sheets
+
+App ghi mỗi ngày một dòng vào sheet **Nhật ký** (cân nặng, BMI, nước, vận động, giấc ngủ, buổi tập, bữa ăn, điểm…) qua một Apps Script Web App.
+
+1. Mở Google Sheet → **Tiện ích mở rộng → Apps Script**.
+2. Xóa code mẫu, dán toàn bộ [`apps-script/Code.gs`](apps-script/Code.gs). Đổi `TOKEN` thành một mã bí mật của bạn.
+3. Chọn hàm `setup` → **Chạy** → cấp quyền.
+4. **Triển khai → Tùy chọn triển khai mới → Ứng dụng web**: *Thực thi với tư cách*: **Tôi**, *Ai có quyền truy cập*: **Bất kỳ ai** → Triển khai, sao chép URL `/exec`.
+5. Trong app: **⚙️ Cài đặt → Google Sheets** → dán URL + mã bảo mật → **Lưu & kiểm tra kết nối**.
+
+URL và mã bảo mật chỉ lưu trên thiết bị, không có trong repo. Làm bước 5 trên từng thiết bị muốn đồng bộ.

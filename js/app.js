@@ -29,12 +29,15 @@
     }
   }
 
+  const saveHooks = [];
+
   function save() {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     } catch {
       toast('Không lưu được dữ liệu');
     }
+    saveHooks.forEach((fn) => fn());
   }
 
   let state = load();
@@ -216,15 +219,7 @@
       parseKey(currentDate).toLocaleDateString('vi-VN', { weekday: 'long', day: 'numeric', month: 'numeric', year: 'numeric' });
     $('#next-day').disabled = isToday;
 
-    const water = sum(d.water, (w) => w.ml);
-    const actMin = sum(d.activity, (a) => a.minutes);
-    const actKcal = sum(d.activity, (a) => a.kcal);
-    const sleepH = d.sleep ? d.sleep.hours : 0;
-
-    const pWater = clamp01(water / s.waterGoal);
-    const pAct = clamp01(actMin / s.activityGoal);
-    const pSleep = d.sleep ? clamp01(1 - Math.abs(sleepH - s.sleepGoal) / s.sleepGoal) : 0;
-    const score = Math.round(pWater * 35 + pAct * 35 + pSleep * 30);
+    const { water, actMin, actKcal, sleepH, pWater, pAct, pSleep, score } = dayStats(currentDate);
 
     // Tổng quan
     $('#score-value').textContent = score;
@@ -236,7 +231,7 @@
     $('#home-activity-bar').style.width = `${pAct * 100}%`;
     $('#home-sleep').textContent = d.sleep ? `${sleepH.toFixed(1)} giờ` : '-';
     $('#home-sleep-bar').style.width = `${pSleep * 100}%`;
-    const bmi = bmiInfo(latestWeight(), s.height);
+    const bmi = bmiInfo(latestWeight(), s.height || (state.plan && state.plan.profile.height));
     $('#home-bmi').textContent = bmi ? bmi.bmi.toFixed(1) : '-';
     $('#home-bmi-label').textContent = bmi ? bmi.label : 'Chưa có dữ liệu';
     renderWeek();
@@ -291,6 +286,20 @@
     st.sleepGoal.value = s.sleepGoal;
 
     renderHooks.forEach((fn) => fn());
+  }
+
+  function dayStats(key) {
+    const d = peekDay(key);
+    const s = state.settings;
+    const water = sum(d.water, (w) => w.ml);
+    const actMin = sum(d.activity, (a) => a.minutes);
+    const actKcal = sum(d.activity, (a) => a.kcal);
+    const sleepH = d.sleep ? d.sleep.hours : 0;
+    const pWater = clamp01(water / s.waterGoal);
+    const pAct = clamp01(actMin / s.activityGoal);
+    const pSleep = d.sleep ? clamp01(1 - Math.abs(sleepH - s.sleepGoal) / s.sleepGoal) : 0;
+    const score = Math.round(pWater * 35 + pAct * 35 + pSleep * 30);
+    return { water, actMin, actKcal, sleepH, pWater, pAct, pSleep, score };
   }
 
   function renderList(sel, items, tpl, emptyText) {
@@ -402,7 +411,9 @@
   window.Healthy = {
     get state() { return state; },
     save, day, peekDay, todayKey, parseKey, shiftKey, latestWeight, toast, render, go,
+    dayStats, bmiInfo, ACTIVITY_NAMES,
     currentDate: () => currentDate,
+    onSave: (fn) => saveHooks.push(fn),
     onRender: (fn) => renderHooks.push(fn),
     onView: (fn) => viewHooks.push(fn)
   };
@@ -417,5 +428,12 @@
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+    // Có bản mới (service worker mới tiếp quản) thì tải lại một lần để không dùng lẫn file cũ/mới
+    if (navigator.serviceWorker.controller) {
+      let reloaded = false;
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (!reloaded) { reloaded = true; location.reload(); }
+      });
+    }
   }
 })();

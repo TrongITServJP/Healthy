@@ -1,12 +1,13 @@
 // Tăng số phiên bản mỗi khi cập nhật file để điện thoại tải bản mới
-const CACHE = 'healthy-v2';
+const CACHE = 'healthy-v3';
 const ASSETS = [
   './',
   'index.html',
-  'css/style.css',
-  'js/plan-data.js',
-  'js/app.js',
-  'js/plan.js',
+  'css/style.css?v=3',
+  'js/plan-data.js?v=3',
+  'js/app.js?v=3',
+  'js/plan.js?v=3',
+  'js/sync.js?v=3',
   'manifest.json',
   'icons/icon.svg',
   'icons/icon-192.png',
@@ -25,14 +26,18 @@ self.addEventListener('activate', (e) => {
   );
 });
 
-// Ưu tiên mạng, mất mạng thì dùng bản đã lưu
+// Ưu tiên mạng (bỏ qua cache HTTP của trình duyệt), mất mạng thì dùng bản đã lưu.
+// Chỉ xử lý file của chính app — không đụng tới request gửi Google Sheets.
 self.addEventListener('fetch', (e) => {
-  if (e.request.method !== 'GET') return;
+  const url = new URL(e.request.url);
+  if (e.request.method !== 'GET' || url.origin !== self.location.origin) return;
   e.respondWith(
-    fetch(e.request)
+    fetch(e.request.url, { cache: 'no-cache' })
       .then((res) => {
-        const copy = res.clone();
-        caches.open(CACHE).then((c) => c.put(e.request, copy));
+        if (res.ok) {
+          const copy = res.clone();
+          caches.open(CACHE).then((c) => c.put(e.request, copy));
+        }
         return res;
       })
       .catch(() => caches.match(e.request).then((r) => r || caches.match('index.html')))

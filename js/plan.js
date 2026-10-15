@@ -3,6 +3,12 @@
 
   const H = window.Healthy;
   const D = window.PLAN_DATA;
+  if (!H || !D) {
+    // Thường do trình duyệt còn giữ file cũ — báo người dùng tải lại thay vì để trống
+    const v = document.getElementById('view-plan');
+    if (v) v.insertAdjacentHTML('afterbegin', '<div class="card warn">Ứng dụng vừa được cập nhật. <a href="" onclick="location.reload(true);return false">Chạm để tải lại</a>.</div>');
+    return;
+  }
   const PLAN_DAYS = 90;
   const WEEKDAYS = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
 
@@ -412,6 +418,32 @@
   });
 
   window.addEventListener('resize', () => { if (subTab === 'road') render(); });
+
+  // Tóm tắt dữ liệu kế hoạch của một ngày (dùng cho đồng bộ Google Sheets)
+  function summary(key) {
+    const dayNum = dayNumber(key);
+    const inPlan = dayNum >= 1 && dayNum <= PLAN_DAYS;
+    const log = plan().log[key] || { ex: [], meals: [], heel: [], logged: false };
+    const week = weekOf(Math.min(PLAN_DAYS, Math.max(1, dayNum)));
+    const phase = phaseOf(week);
+    const weekday = H.parseKey(key).getDay();
+    const w = workoutFor(weekday, phase);
+    const exTotal = w.blocks.reduce((a, b) => a + b.items.length, 0);
+    const menu = buildMenu(weekday, calc().kcal[phase]);
+    const eaten = menu.meals.filter((m) => log.meals.includes(m.name));
+    return {
+      day: inPlan ? dayNum : '',
+      target: inPlan ? +targetForDay(calc(), dayNum).toFixed(1) : '',
+      workout: inPlan ? w.title : '',
+      exercises: inPlan && exTotal ? `${log.ex.length}/${exTotal}` : '',
+      logged: log.logged,
+      mealsKcal: Math.round(eaten.reduce((a, m) => a + m.kcal, 0)),
+      meals: eaten.map((m) => m.name).join(', '),
+      heel: `${log.heel.length}/${D.HEEL_ROUTINE.length}`
+    };
+  }
+
+  window.HealthyPlan = { summary, profile: () => plan().profile };
 
   H.onRender(render);
   H.onView((v) => { if (v === 'plan') render(); });

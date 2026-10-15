@@ -12,7 +12,7 @@
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/style.css?v=3">
 </head>
 <body>
   <header class="topbar">
@@ -353,6 +353,25 @@
         </form>
       </div>
       <div class="card">
+        <h2>Google Sheets</h2>
+        <p class="muted small">Tự động ghi dữ liệu mỗi ngày (cân nặng, nước, vận động, giấc ngủ, kế hoạch) vào Google Sheet của bạn.</p>
+        <form id="sync-form" class="form">
+          <label>URL Web App (Apps Script)
+            <input type="url" name="url" placeholder="https://script.google.com/macros/s/…/exec" autocomplete="off">
+          </label>
+          <label>Mã bảo mật
+            <input type="text" name="token" autocomplete="off" autocapitalize="off" spellcheck="false">
+          </label>
+          <label class="inline"><input type="checkbox" name="auto" checked> Tự động đồng bộ khi có thay đổi</label>
+          <button class="btn primary block" type="submit">Lưu &amp; kiểm tra kết nối</button>
+        </form>
+        <div class="btn-row sync-actions" id="sync-actions" hidden>
+          <button class="btn" id="sync-all">Đồng bộ toàn bộ</button>
+          <button class="btn ghost" id="sync-off">Ngắt kết nối</button>
+        </div>
+        <p class="status" id="sync-status"></p>
+      </div>
+      <div class="card">
         <h2>Dữ liệu</h2>
         <p class="muted small">Dữ liệu chỉ lưu trên trình duyệt của thiết bị này.</p>
         <div class="btn-row">
@@ -375,8 +394,9 @@
 
   <div class="toast" id="toast"></div>
 
-  <script src="js/plan-data.js"></script>
-  <script src="js/app.js"></script>
-  <script src="js/plan.js"></script>
+  <script src="js/plan-data.js?v=3"></script>
+  <script src="js/app.js?v=3"></script>
+  <script src="js/plan.js?v=3"></script>
+  <script src="js/sync.js?v=3"></script>
 </body>
 </html>
